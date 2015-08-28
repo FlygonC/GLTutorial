@@ -1,20 +1,21 @@
-#include "gl_core_4_4.h"
-#include "GLFW\glfw3.h"
+#include "AppGrid.h"
 
-void main()
+int main()
 {
-	glfwInit();
-
-	auto window = glfwCreateWindow(800, 600, "Window!!!", NULL, NULL);
-
-	glfwMakeContextCurrent(window);
-
-	while (!glfwWindowShouldClose(window)) 
+	Application *App = new AppGrid();
+	if (App->startup() == true)
 	{
-		glfwSwapBuffers(window);
-		glfwPollEvents();
+		while (true)
+		{
+			App->update(0);
+			App->draw();
+		}
 	}
-
-	glfwTerminate();
-	return;
+	else
+	{
+		return -1;
+	}
+	App->shutdown();
+	
+	return 0;
 }
