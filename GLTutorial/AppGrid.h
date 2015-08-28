@@ -22,7 +22,7 @@ public:
 	bool startup();
 	void shutdown();
 
-	bool update(float deltaTime);
+	bool update();
 	void draw();
 
 

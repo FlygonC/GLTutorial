@@ -9,7 +9,7 @@ bool AppGrid::startup()
 		return false;
 	}
 
-	auto window = glfwCreateWindow(800, 600, "Window!!!", NULL, NULL);
+	window = glfwCreateWindow(800, 600, "Window!!!", NULL, NULL);
 
 	if (window == NULL)
 	{
@@ -28,9 +28,9 @@ bool AppGrid::startup()
 	const int minor = ogl_GetMinorVersion();
 	printf("GL: %i.%i\n", major, minor);
 
-	Gizmos::create();
-	mat4 view = glm::lookAt(vec3(10, 10, 10), vec3(0), vec3(0, 1, 0));
-	mat4 projection = glm::perspective(glm::pi<float>() * 0.25f, 16 / 9.f, 0.1f, 1000.f);
+	//Gizmos::create();
+	//mat4 view = glm::lookAt(vec3(10, 10, 10), vec3(0), vec3(0, 1, 0));
+	//mat4 projection = glm::perspective(glm::pi<float>() * 0.25f, 16 / 9.f, 0.1f, 1000.f);
 
 	glClearColor(0.25f, 0.25f, 0.25f, 1);
 
@@ -49,9 +49,16 @@ void AppGrid::shutdown()
 	glfwTerminate();
 }
 
-bool AppGrid::update(float deltaTime)
+bool AppGrid::update()
 {
-	return true;
+	if (!glfwWindowShouldClose(window))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 void AppGrid::draw()
@@ -59,6 +66,8 @@ void AppGrid::draw()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 
+
+	Gizmos::create();
 
 	Gizmos::clear();
 	Gizmos::addTransform(glm::mat4(1));

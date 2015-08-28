@@ -1,13 +1,13 @@
 #include "AppGrid.h"
+#include "AppPlanets.h"
 
 int main()
 {
-	Application *App = new AppGrid();
+	Application *App = new AppPlanets();
 	if (App->startup() == true)
 	{
-		while (true)
+		while (App->update())
 		{
-			App->update(0);
 			App->draw();
 		}
 	}
