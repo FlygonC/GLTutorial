@@ -35,7 +35,14 @@ public:
 
 	void update(float dt)
 	{	//Local Transforms
-		mlocal = glm::rotate(dt, vec3(0, spin, 0));
+		if (spin > 0)
+		{
+			mlocal = glm::rotate(dt, vec3(0, spin, 0));
+		}
+		else
+		{
+			mlocal = mat4(1);
+		}
 		if (parent)
 		{	//Parent transforms
 			morbit = parent->morbit;
@@ -78,12 +85,14 @@ public:
 	mat4 view;
 	mat4 projection;
 
-	float currentTime;
-	float deltaTime;
-	float lastTime;
+	float currentTime = 0;
+	float deltaTime = 0;
+	float lastTime = 0;
 
 	//std::list<Body> planets;
 	int numberOfPlanets = 10;
 	Body planets[10];
-	Body sun, mars;
+	//Body sun, mars;
+
+	int cameraFocus = 0;
 };
