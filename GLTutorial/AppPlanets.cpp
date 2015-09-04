@@ -2,22 +2,21 @@
 
 AppPlanets::AppPlanets() {}
 
-bool AppPlanets::startup()
+int AppPlanets::oninit()
 {
-	if (!startGL())
-	{
-		return false;
-	}
+	camera.setPerspective(glm::pi<float>() * 0.25f, 9.f/16.f, .5f, 4000);
+	camera.setLookAt(vec3(0, 0, 0), vec3(0, 0, -1), vec3(0, 1, 0));
+	camera.setPosition(vec3(0, 0, 1000));
+	camera.setSpeed(2);
 
-	//109 =			   695,500
-	//mercury = 46,000,000,000
+	Gizmos::create();
 
 	//				  size			spin							distance		orbit
 	planets[0] = Body(109.f,		0,				nullptr,		0,				0,					"Sun"); //planets[0].hasRings = false;
 	planets[1] = Body(.38f,			24.f / 60.f,	&planets[0],	130.f,			365.f / 88.f,		"Mercury");
 	planets[2] = Body(.95f,			24.f / 243.f,	&planets[0],	160.f,			365.f / 224.f,		"Venus");
 	planets[3] = Body(1.f,			1.f,			&planets[0],	190.f,			1.f,				"Earth");
-	planets[4] = Body(0.1f,			1.f,			&planets[3],	2.f,			365.f / 16.f,		"Moon");
+	planets[4] = Body(0.33f,		1.f,			&planets[3],	3.f,			365.f / 16.f,		"Moon");
 	planets[5] = Body(.53f,			24.f / 24.3f,	&planets[0],	220.f,			365.f / 686.97f,	"Mars");
 	planets[6] = Body(11.20f,		24.f / 9.8f,	&planets[0],	250.f,			365.f / 4331.572f,	"Jupiter");
 	planets[7] = Body(9.45f,		24.f / 10.2f,	&planets[0],	270.f,			365.f / 10832.33f,	"Saturn"); planets[7].hasRings = true;
@@ -28,39 +27,25 @@ bool AppPlanets::startup()
 	return true;
 }
 
-void AppPlanets::shutdown()
+void AppPlanets::onkill()
 {
-	
 	Gizmos::destroy();
-
-	glfwDestroyWindow(window);
-	glfwTerminate();
 }
 
-bool AppPlanets::update()
+bool AppPlanets::onstep(float deltaTime)
 {
-	if (!glfwWindowShouldClose(window))
+	for (int i = 0; i < numberOfPlanets; i++)
 	{
-
-
-
-		return true;
+		planets[i].update(getCurrentTime());
 	}
-	else
-	{
-		return false;
-	}
+
+	camera.update(deltaTime);
+
+	return true;
 }
 
-void AppPlanets::draw()
+void AppPlanets::ondraw()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	currentTime = glfwGetTime();
-	deltaTime = currentTime - lastTime;
-	lastTime = currentTime;
-
-	Gizmos::create();
 
 	Gizmos::clear();
 	/*Gizmos::addTransform(glm::mat4(1));
@@ -73,11 +58,7 @@ void AppPlanets::draw()
 		Gizmos::addLine(vec3(10, 0, -10 + i), vec3(-10, 0, -10 + i), i == 10 ? white : black);
 	}*/
 
-	for (int i = 0; i < numberOfPlanets; i++)
-	{
-		planets[i].update(currentTime);
-	}
-
+	
 	for (int i = 0; i < numberOfPlanets; i++)
 	{
 		Gizmos::addSphere(vec3(1), planets[i].radius, 20, 20, vec4(0.9f, 0.9f, 0.9f, 1), &planets[i].mfinal);
@@ -87,60 +68,11 @@ void AppPlanets::draw()
 		}
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) == true)
-	{
-		cameraFocus++;
-	}
-	if (glfwGetKey(window, GLFW_KEY_LEFT) == true)
-	{
-		cameraFocus--;
-	}
+	view = glm::lookAt(vec3(planets[cameraFocus].mfinal[3][0] + (planets[cameraFocus].radius * 5), 
+		planets[cameraFocus].mfinal[3][1] + (planets[cameraFocus].radius * 5), planets[cameraFocus].mfinal[3][2]), 
+		(vec3)planets[cameraFocus].mfinal[3], vec3(0, 1, 0));
 
-	view = glm::lookAt(vec3(planets[cameraFocus].mfinal[3][0] + (planets[cameraFocus].radius * 5), planets[cameraFocus].mfinal[3][1] + (planets[cameraFocus].radius * 5), planets[cameraFocus].mfinal[3][2]), (vec3)planets[cameraFocus].mfinal[3], vec3(0, 1, 0));
+	Gizmos::draw(camera.getProjectionView());
 
-	Gizmos::draw(projection * view);
-
-
-	glfwSwapBuffers(window);
-	glfwPollEvents();
 }
 
-bool AppPlanets::startGL()
-{
-	if (glfwInit() == false)
-	{
-		return false;
-	}
-
-	window = glfwCreateWindow(1600, 900, "Planets", NULL, NULL);
-
-	if (window == NULL)
-	{
-		return false;
-	}
-
-	glfwMakeContextCurrent(window);
-
-	if (ogl_LoadFunctions() == ogl_LOAD_FAILED)
-	{
-		glfwDestroyWindow(window);
-		glfwTerminate();
-		return false;
-	}
-	const int major = ogl_GetMajorVersion();
-	const int minor = ogl_GetMinorVersion();
-	printf("GL: %i.%i\n", major, minor);
-
-	//Gizmos::create();
-	//mat4 view = glm::lookAt(vec3(10, 10, 10), vec3(0), vec3(0, 1, 0));
-	//mat4 projection = glm::perspective(glm::pi<float>() * 0.25f, 16 / 9.f, 0.1f, 1000.f);
-
-	glClearColor(0.25f, 0.25f, 0.25f, 1);
-	glEnable(GL_DEPTH_TEST);
-
-	Gizmos::create();
-	view = glm::lookAt(vec3(109*6, 109*6, 0), vec3(0), vec3(0, 1, 0));
-	projection = glm::perspective(glm::pi<float>() * 0.25f, 16 / 9.f, 0.1f, 4000.f);
-
-	return true;
-}

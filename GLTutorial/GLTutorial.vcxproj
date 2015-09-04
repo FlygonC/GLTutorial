@@ -128,7 +128,10 @@
     <ClCompile Include="..\includes\aie\Gizmos.cpp" />
     <ClCompile Include="..\includes\gl_core_4_4.c" />
     <ClCompile Include="AppGrid.cpp" />
+    <ClCompile Include="Application.cpp" />
     <ClCompile Include="AppPlanets.cpp" />
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="FlyCamera.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -140,6 +143,8 @@
     <ClInclude Include="AppGrid.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="AppPlanets.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="FlyCamera.h" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\dependencies\glfw3.lib" />

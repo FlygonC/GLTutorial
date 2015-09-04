@@ -4,9 +4,9 @@
 int main()
 {
 	Application *App = new AppPlanets();
-	if (App->startup() == true)
+	if (App->init())
 	{
-		while (App->update())
+		while (App->step())
 		{
 			App->draw();
 		}
@@ -15,7 +15,7 @@ int main()
 	{
 		return -1;
 	}
-	App->shutdown();
+	App->kill();
 	
 	return 0;
 }

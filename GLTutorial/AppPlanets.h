@@ -1,19 +1,6 @@
 #pragma once
 #include "Application.h"
-
-#include <gl_core_4_4.h>
-#include <GLFW\glfw3.h>
-
-#include <aie\Gizmos.h>
-#include <glm\glm.hpp>
-#include <glm\ext.hpp>
-
-#include <iostream>
-#include <list>
-
-using glm::vec3;
-using glm::vec4;
-using glm::mat4;
+#include "FlyCamera.h"
 
 class Body
 {
@@ -74,25 +61,17 @@ class AppPlanets : public Application
 public:
 	AppPlanets();
 
-	bool startup();
-	void shutdown();
 
-	bool update();
-	void draw();
-
-	bool startGL();
-	GLFWwindow *window;
-	mat4 view;
-	mat4 projection;
-
-	float currentTime = 0;
-	float deltaTime = 0;
-	float lastTime = 0;
-
-	//std::list<Body> planets;
 	int numberOfPlanets = 10;
 	Body planets[10];
-	//Body sun, mars;
 
+	FlyCamera camera;
 	int cameraFocus = 0;
+
+	int oninit();
+	void onkill();
+
+	bool onstep(float deltaTime);
+	void ondraw();
+
 };

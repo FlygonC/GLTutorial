@@ -1,11 +1,44 @@
 #pragma once
+#include <gl_core_4_4.h>
+#include <GLFW\glfw3.h>
+
+#include <aie\Gizmos.h>
+#include <glm\glm.hpp>
+#include <glm\ext.hpp>
+
+#include <iostream>
+#include <list>
+
+using glm::vec3;
+using glm::vec4;
+using glm::mat4;
 
 class Application 
 {
-public:
-	virtual bool startup() = 0;
-	virtual void shutdown() = 0;
+private:
+	float currentTime = 0;
+	float deltaTime = 0;
+	float lastTime = 0;
 
-	virtual bool update() = 0;
-	virtual void draw() = 0;
+	bool startGL();
+
+protected:
+	GLFWwindow *window;
+	mat4 view;
+	mat4 projection;
+
+	virtual int  oninit() { return -99; }
+	virtual void onkill() {}
+	virtual bool onstep(float deltaTime) { return false; }
+	virtual void ondraw() {}
+
+public:
+	
+	int  init();
+	void kill();
+	bool step();
+	void draw();
+
+	float getDeltaTime();
+	float getCurrentTime();
 };
