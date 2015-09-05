@@ -16,9 +16,7 @@ void Camera::setLookAt(vec3 from, vec3 to, vec3 up)
 }
 void Camera::setPosition(vec3 position)
 {
-	worldTransform[3].x = position.x;
-	worldTransform[3].y = position.y;
-	worldTransform[3].z = position.z;
+	worldTransform *= glm::translate(position);
 }
 
 mat4 Camera::getWorldTransform() { return worldTransform; }

@@ -1,9 +1,10 @@
 #include "AppGrid.h"
-#include "AppPlanets.h"
+//#include "AppPlanets.h"
+#include "AppRenderer.h"
 
 int main()
 {
-	Application *App = new AppPlanets();
+	Application *App = new AppRenderer();
 	if (App->init())
 	{
 		while (App->step())
@@ -16,6 +17,7 @@ int main()
 		return -1;
 	}
 	App->kill();
+	delete App;
 	
 	return 0;
 }

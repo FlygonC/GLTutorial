@@ -5,9 +5,9 @@ AppPlanets::AppPlanets() {}
 int AppPlanets::oninit()
 {
 	camera.setPerspective(glm::pi<float>() * 0.25f, 9.f/16.f, .5f, 4000);
-	camera.setLookAt(vec3(0, 0, 0), vec3(0, 0, -1), vec3(0, 1, 0));
-	camera.setPosition(vec3(0, 0, 1000));
-	camera.setSpeed(2);
+	//camera.setLookAt(vec3(200, 200, 0), vec3(0, 0, -1), vec3(0, 1, 0));
+	camera.setPosition(vec3(0, 200, 450));
+	camera.setSpeed(100, 0.5);
 
 	Gizmos::create();
 
@@ -48,29 +48,23 @@ void AppPlanets::ondraw()
 {
 
 	Gizmos::clear();
-	/*Gizmos::addTransform(glm::mat4(1));
-	vec4 white(1);
-	vec4 black(0, 0, 0, 1);
-
-	for (int i = 0; i < 21; ++i)
-	{
-		Gizmos::addLine(vec3(-10 + i, 0, 10), vec3(-10 + i, 0, -10), i == 10 ? white : black);
-		Gizmos::addLine(vec3(10, 0, -10 + i), vec3(-10, 0, -10 + i), i == 10 ? white : black);
-	}*/
-
 	
 	for (int i = 0; i < numberOfPlanets; i++)
 	{
-		Gizmos::addSphere(vec3(1), planets[i].radius, 20, 20, vec4(0.9f, 0.9f, 0.9f, 1), &planets[i].mfinal);
+		Gizmos::addSphere(vec3(1), planets[i].radius, 20, 20, vec4(0.8f, 0.8f, 0.8f, 1), &planets[i].mfinal);
 		if (planets[i].hasRings)
 		{
 			Gizmos::addRing((vec3)planets[i].mfinal[3] / 2, 13.f, 17.f, 20, vec4(1, 1, 1, 0), &planets[i].mfinal);
 		}
 	}
 
-	view = glm::lookAt(vec3(planets[cameraFocus].mfinal[3][0] + (planets[cameraFocus].radius * 5), 
+	Gizmos::addRing(vec3(0,  10, 0), 500.f, 505.f, 40, vec4(1, 1, 1, 0));
+	Gizmos::addRing(vec3(0,   0, 0), 500.f, 505.f, 40, vec4(1, 1, 1, 0));
+	Gizmos::addRing(vec3(0, -10, 0), 500.f, 505.f, 40, vec4(1, 1, 1, 0));
+
+	/*view = glm::lookAt(vec3(planets[cameraFocus].mfinal[3][0] + (planets[cameraFocus].radius * 5), 
 		planets[cameraFocus].mfinal[3][1] + (planets[cameraFocus].radius * 5), planets[cameraFocus].mfinal[3][2]), 
-		(vec3)planets[cameraFocus].mfinal[3], vec3(0, 1, 0));
+		(vec3)planets[cameraFocus].mfinal[3], vec3(0, 1, 0));*/
 
 	Gizmos::draw(camera.getProjectionView());
 

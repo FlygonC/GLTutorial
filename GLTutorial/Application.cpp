@@ -26,7 +26,7 @@ bool Application::startGL()
 	const int minor = ogl_GetMinorVersion();
 	printf("GL: %i.%i\n", major, minor);
 
-	glClearColor(0.25f, 0.25f, 0.25f, 1);
+	glClearColor(0.5f, 0.5f, 0.5f, 1);
 	glEnable(GL_DEPTH_TEST);
 
 	view = glm::lookAt(vec3(109 * 6, 109 * 6, 0), vec3(0), vec3(0, 1, 0));

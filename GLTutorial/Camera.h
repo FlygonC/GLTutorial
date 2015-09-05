@@ -9,7 +9,7 @@ using glm::mat4;
 class Camera
 {
 protected:
-	mat4 worldTransform = mat4(0);
+	mat4 worldTransform = mat4(1);
 	//mat4 viewTransform = mat4(0);
 	mat4 projectionTransform = mat4(0);
 	//mat4 projectionViewTransform = mat4(0);
