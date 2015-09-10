@@ -39,11 +39,11 @@ int AppRenderer::oninit()
 	glLinkProgram(programID);
 	//make sure it worked
 	glGetProgramiv(programID,GL_LINK_STATUS, &success);
-	if (success ==GL_FALSE)
+	if (success == GL_FALSE)
 	{
 		int infoLogLength = 0;
 		glGetProgramiv(programID,GL_INFO_LOG_LENGTH, &infoLogLength);
-		char* infoLog =new char[infoLogLength];
+		char* infoLog = new char[infoLogLength];
 		glGetProgramInfoLog(programID, infoLogLength, 0, infoLog);
 		printf("Error: Failed to link shader program!\n");
 		printf("%s\n", infoLog);
@@ -53,7 +53,11 @@ int AppRenderer::oninit()
 	glDeleteShader(fragmentShader);
 	glDeleteShader(vertexShader);
 
-	generateGrid(20, 20);
+	//generateGrid(20, 20);
+
+	err = tinyobj::LoadObj(shapes, materials, "../stanford_objs/dragon.obj");
+	createOpenGLBuffers(shapes);
+
 
 	camera.setPerspective(glm::pi<float>() * 0.4f, 9.f / 16.f, .5f, 4000);
 	camera.setSpeed(100, 0.1);
@@ -74,32 +78,19 @@ bool AppRenderer::onstep(float deltaTime)
 }
 
 void AppRenderer::ondraw()
-{
+{ 
 	glUseProgram(programID);
 	unsigned int projectionViewUniform = glGetUniformLocation(programID, "ProjectionView");
 	glUniformMatrix4fv(projectionViewUniform, 1, false, glm::value_ptr(camera.getProjectionView()));
-	glBindVertexArray(VAO);
-	unsigned int indexCount = (rows - 1) * (cols - 1) * 6;
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
-
-	/*Gizmos::create();
-
-	Gizmos::clear();
-	Gizmos::addTransform(glm::mat4(1));
-	vec4 white(1);
-	vec4 black(0, 0, 0, 1);
-
-	for (int i = 0; i < 21; ++i)
+	for (unsigned int i = 0; i < glInfo.size(); i++)
 	{
-		Gizmos::addLine(vec3(-10 + i, 0, 10), vec3(-10 + i, 0, -10), i == 10 ? white : black);
-		Gizmos::addLine(vec3(10, 0, -10 + i), vec3(-10, 0, -10 + i), i == 10 ? white : black);
+		glBindVertexArray(glInfo[i].VAO);
+		glDrawElements(GL_TRIANGLES, glInfo[i].indexCount, GL_UNSIGNED_INT, 0);
 	}
-	Gizmos::draw(camera.getProjectionView());*/
 
 }
 
-
+/*
 void AppRenderer::generateGrid(unsigned int prows, unsigned int columns)
 {
 	rows = prows;
@@ -164,4 +155,47 @@ void AppRenderer::generateGrid(unsigned int prows, unsigned int columns)
 
 	delete[] auiIndices;
 	delete[] aoVertices;
+}
+*/
+
+void AppRenderer::createOpenGLBuffers(std::vector<tinyobj::shape_t>& shapes)
+{
+	glInfo.resize(shapes.size());
+
+	for (unsigned int meshIndex = 0; meshIndex < shapes.size(); meshIndex++)
+	{
+		glGenVertexArrays(1, &glInfo[meshIndex].VAO);
+		glGenBuffers(1, &glInfo[meshIndex].VBO);
+		glGenBuffers(1, &glInfo[meshIndex].IBO);
+		glBindVertexArray(glInfo[meshIndex].VAO);
+
+		unsigned int floatCount = shapes[meshIndex].mesh.positions.size();
+		floatCount += shapes[meshIndex].mesh.normals.size();
+		floatCount += shapes[meshIndex].mesh.texcoords.size();
+
+		std::vector<float> vertexData;
+		vertexData.reserve(floatCount);
+
+		vertexData.insert(vertexData.end(), shapes[meshIndex].mesh.positions.begin(), shapes[meshIndex].mesh.positions.end());
+
+		vertexData.insert(vertexData.end(), shapes[meshIndex].mesh.normals.begin(), shapes[meshIndex].mesh.normals.end());
+
+		glInfo[meshIndex].indexCount = shapes[meshIndex].mesh.indices.size();
+
+		glBindBuffer(GL_ARRAY_BUFFER, glInfo[meshIndex].VBO);
+		glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(float), vertexData.data(), GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glInfo[meshIndex].IBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, shapes[meshIndex].mesh.indices.size() * sizeof(unsigned int), shapes[meshIndex].mesh.indices.data(), GL_STATIC_DRAW);
+
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)(sizeof(float) * shapes[meshIndex].mesh.positions.size()));
+
+		glBindVertexArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	}
 }
