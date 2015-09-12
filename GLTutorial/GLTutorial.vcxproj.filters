@@ -13,15 +13,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Includes">
+      <UniqueIdentifier>{0581a57a-8e66-4613-8cc4-6a9e5fe3094c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Includes">
+      <UniqueIdentifier>{2fef9a68-3c60-4195-ba2c-d9c7fb027225}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\includes\gl_core_4_4.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\includes\aie\Gizmos.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AppGrid.cpp">
@@ -45,26 +45,20 @@
     <ClCompile Include="AppRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\includes\tiny_obj_loader.cc">
+    <ClCompile Include="AppFBX.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\includes\gl_core_4_4.c">
+      <Filter>Source Files\Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\includes\tiny_obj_loader.cc">
+      <Filter>Source Files\Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\includes\aie\Gizmos.cpp">
+      <Filter>Source Files\Includes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\includes\GLFW\glfw3.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\includes\GLFW\glfw3native.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\includes\glm\glm.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\includes\gl_core_4_4.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\includes\aie\Gizmos.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -86,8 +80,32 @@
     <ClInclude Include="AppRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\includes\tiny_obj_loader.h">
+    <ClInclude Include="AppFBX.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\includes\FBXFile.h">
+      <Filter>Header Files\Includes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\includes\aie\Gizmos.h">
+      <Filter>Header Files\Includes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\includes\gl_core_4_4.h">
+      <Filter>Header Files\Includes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\includes\GLFW\glfw3.h">
+      <Filter>Header Files\Includes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\includes\GLFW\glfw3native.h">
+      <Filter>Header Files\Includes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\includes\glm\glm.hpp">
+      <Filter>Header Files\Includes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\includes\stb_image.h">
+      <Filter>Header Files\Includes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\includes\tiny_obj_loader.h">
+      <Filter>Header Files\Includes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

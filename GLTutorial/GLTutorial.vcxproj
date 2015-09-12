@@ -80,7 +80,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)\dependencies</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;FBXLoader_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -128,6 +128,7 @@
     <ClCompile Include="..\includes\aie\Gizmos.cpp" />
     <ClCompile Include="..\includes\gl_core_4_4.c" />
     <ClCompile Include="..\includes\tiny_obj_loader.cc" />
+    <ClCompile Include="AppFBX.cpp" />
     <ClCompile Include="AppGrid.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="AppPlanets.cpp" />
@@ -139,11 +140,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\includes\aie\Gizmos.h" />
+    <ClInclude Include="..\includes\FBXFile.h" />
     <ClInclude Include="..\includes\GLFW\glfw3.h" />
     <ClInclude Include="..\includes\GLFW\glfw3native.h" />
     <ClInclude Include="..\includes\glm\glm.hpp" />
     <ClInclude Include="..\includes\gl_core_4_4.h" />
+    <ClInclude Include="..\includes\stb_image.h" />
     <ClInclude Include="..\includes\tiny_obj_loader.h" />
+    <ClInclude Include="AppFBX.h" />
     <ClInclude Include="AppGrid.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="AppPlanets.h" />

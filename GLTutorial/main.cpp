@@ -1,10 +1,11 @@
 #include "AppGrid.h"
 //#include "AppPlanets.h"
-#include "AppRenderer.h"
+//#include "AppRenderer.h"
+#include "AppFBX.h"
 
 int main()
 {
-	Application *App = new AppRenderer();
+	Application *App = new AppFBX();
 	if (App->init())
 	{
 		while (App->step())

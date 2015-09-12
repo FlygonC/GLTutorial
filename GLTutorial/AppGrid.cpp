@@ -81,7 +81,7 @@ void AppGrid::draw()
 	}
 	Gizmos::draw(projection * view);
 
-
+	  
 	glfwSwapBuffers(window);
 	glfwPollEvents();
 }

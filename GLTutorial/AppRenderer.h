@@ -1,7 +1,9 @@
 #pragma once
+
 #include "Application.h"
 #include "FlyCamera.h"
 
+#include <stb_image.h>
 #include <tiny_obj_loader.h>
 #include <vector>
 
@@ -11,22 +13,6 @@ struct Vertex
 	vec4 color;
 };
 
-/*
-typedef struct
-{
-	std::vector<float> positions;
-	std::vector<float> normals;
-	std::vector<float> texcords;
-	std::vector<unsigned int> index;
-	std::vector<float> material_ids;
-} mesh_t;
-
-typedef struct
-{
-	std::string name;
-	mesh_t mesh;
-} shape_t;
-*/
 
 struct OpenGLInfo
 {
@@ -44,10 +30,18 @@ public:
 
 	std::vector<tinyobj::shape_t> shapes;
 	std::vector<tinyobj::material_t> materials;
-	
-	std::string err;
-	
 	std::vector<OpenGLInfo> glInfo;
+
+	std::string err;
+
+	int imageWidth, imageHeight, imageFormat = 0;
+	unsigned char* data;
+	unsigned int texture = 0;
+
+	unsigned int VAO;
+	unsigned int VBO;
+	unsigned int IBO;
+	//unsigned int indexCount;
 
 	unsigned int programID;
 
@@ -62,4 +56,6 @@ public:
 	//void generateGrid(unsigned int prows, unsigned int columns);
 
 	void createOpenGLBuffers(std::vector<tinyobj::shape_t>& shapes);
+
+	void createTexturedSquare();
 };
