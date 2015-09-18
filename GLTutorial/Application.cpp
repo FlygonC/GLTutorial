@@ -7,7 +7,7 @@ bool Application::startGL()
 		return false;
 	}
 
-	window = glfwCreateWindow(1600, 900, "Planets", NULL, NULL);
+	window = glfwCreateWindow(1600, 900, "SOUL SPEAR!!!!", NULL, NULL);
 
 	if (window == NULL)
 	{
@@ -26,7 +26,7 @@ bool Application::startGL()
 	const int minor = ogl_GetMinorVersion();
 	printf("GL: %i.%i\n", major, minor);
 
-	glClearColor(0.5f, 0.5f, 0.5f, 1);
+	glClearColor(0.f, 0.f, 0.f, 1);
 	glEnable(GL_DEPTH_TEST);
 
 	view = glm::lookAt(vec3(109 * 6, 109 * 6, 0), vec3(0), vec3(0, 1, 0));

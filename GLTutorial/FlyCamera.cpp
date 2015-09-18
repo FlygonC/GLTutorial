@@ -31,7 +31,7 @@ void FlyCamera::update(float dt)
 	}
 	//mouse observing
 	vec2 mouse;
-	if (!control.keyDown(32))
+	if (control.keyDown(32))
 	{
 		mouse = control.trackMouse(true) * sensitivity;
 	}

@@ -9,6 +9,7 @@
 #include <FBXFile.h>
 //#include <tiny_obj_loader.h>
 #include <vector>
+#include <fstream>
 
 class AppFBX : public Application
 {
@@ -25,7 +26,6 @@ public:
 	struct Vertex
 	{
 		vec4 vertex;
-		// HOTDOG
 	};
 
 
@@ -36,7 +36,7 @@ public:
 
 	int imageWidth, imageHeight, imageFormat = 0;
 	unsigned char* data;
-	unsigned int programID, texture = 0;
+	unsigned int programID, texDiffuse, texSpecular = 0;
 
 	FlyCamera camera;
 
@@ -50,4 +50,10 @@ public:
 	void freeFBX();
 	int getMeshCount();
 	FBXMeshNode getMeshByIndex(int index);
+
+	unsigned int loadShader(unsigned int type, const std::string path);
+	unsigned int createShaderProgram(const std::string vertexShaderPath, const std::string fragmentShaderPath);
+	void freeShaderProgram();
+
+	unsigned int loadTexture(const std::string path);
 };

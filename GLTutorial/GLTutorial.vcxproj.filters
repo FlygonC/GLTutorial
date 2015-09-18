@@ -108,9 +108,4 @@
       <Filter>Header Files\Includes</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\dependencies\glfw3.lib">
-      <Filter>Resource Files</Filter>
-    </Library>
-  </ItemGroup>
 </Project>
