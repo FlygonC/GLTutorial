@@ -19,16 +19,17 @@ private:
 	float currentTime = 0;
 	float deltaTime = 0;
 	float lastTime = 0;
+	int screenHeight, screenWidth;
 	vec3 skyColor = vec3(0);
 
-	bool startGL();
+	bool startGL(int width, int height, const char* title);
 
 	
 
 protected:
 	GLFWwindow *window;
-	mat4 view;
-	mat4 projection;
+	//mat4 view;
+	//mat4 projection;
 
 	virtual int  oninit() { return -99; }
 	virtual void onkill() {}
@@ -39,7 +40,7 @@ protected:
 
 public:
 	
-	int  init();
+	int  init(int width, int height, const char* title);
 	void kill();
 	bool step();
 	void draw();
@@ -48,4 +49,6 @@ public:
 	float getCurrentTime();
 	
 	vec3 getSky();
+	int getWidth();
+	int getHeight();
 };

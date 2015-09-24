@@ -1,12 +1,12 @@
-#include "AppGrid.h"
 //#include "AppPlanets.h"
 //#include "AppRenderer.h"
 #include "AppFBX.h"
+#include "AppDeferred.h"
 
 int main()
 {
-	Application *App = new AppFBX();
-	if (App->init())
+	Application *App = new AppDeferred();
+	if (App->init(1600, 900, "Application"))
 	{
 		while (App->step())
 		{

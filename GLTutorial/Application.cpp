@@ -1,13 +1,13 @@
 #include "Application.h"
 
-bool Application::startGL()
+bool Application::startGL(int width, int height, const char* title)
 {
 	if (glfwInit() == false)
 	{
 		return false;
 	}
 
-	window = glfwCreateWindow(1600, 900, "SOUL SPEAR!!!!", NULL, NULL);
+	window = glfwCreateWindow(width, height, title, NULL, NULL);
 
 	if (window == NULL)
 	{
@@ -29,15 +29,17 @@ bool Application::startGL()
 	glClearColor(skyColor.x, skyColor.y, skyColor.z, 1);
 	glEnable(GL_DEPTH_TEST);
 
-	view = glm::lookAt(vec3(109 * 6, 109 * 6, 0), vec3(0), vec3(0, 1, 0));
-	projection = glm::perspective(glm::pi<float>() * 0.25f, 16 / 9.f, 0.1f, 4000.f);
+	//view = glm::lookAt(vec3(109 * 6, 109 * 6, 0), vec3(0), vec3(0, 1, 0));
+	//projection = glm::perspective(glm::pi<float>() * 0.25f, 16 / 9.f, 0.1f, 4000.f);
 
 	return true;
 }
 
-int Application::init()
+int Application::init(int width, int height, const char* title)
 {
-	if (!startGL())
+	screenWidth = width;
+	screenHeight = height;
+	if (!startGL(width, height, title))
 	{
 		return -1;
 	}
@@ -98,4 +100,12 @@ void Application::setSky(vec3 color)
 vec3 Application::getSky()
 {
 	return skyColor;
+}
+int Application::getWidth()
+{
+	return screenWidth;
+}
+int Application::getHeight()
+{
+	return screenHeight;
 }

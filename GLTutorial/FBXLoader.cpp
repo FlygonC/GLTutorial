@@ -40,6 +40,7 @@ void FBXLoader::loadFBX(const char* path)
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
+
 		//Diffuse Map
 		if (m->m_material->textures[FBXMaterial::DiffuseTexture] != NULL)
 		{

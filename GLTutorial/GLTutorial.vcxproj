@@ -130,7 +130,6 @@
     <ClCompile Include="..\includes\tiny_obj_loader.cc" />
     <ClCompile Include="AppDeferred.cpp" />
     <ClCompile Include="AppFBX.cpp" />
-    <ClCompile Include="AppGrid.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="AppPlanets.cpp" />
     <ClCompile Include="AppRenderer.cpp" />
@@ -139,6 +138,7 @@
     <ClCompile Include="FBXLoader.cpp" />
     <ClCompile Include="FlyCamera.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ShaderLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\includes\aie\Gizmos.h" />
@@ -151,7 +151,6 @@
     <ClInclude Include="..\includes\tiny_obj_loader.h" />
     <ClInclude Include="AppDeferred.h" />
     <ClInclude Include="AppFBX.h" />
-    <ClInclude Include="AppGrid.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="AppPlanets.h" />
     <ClInclude Include="AppRenderer.h" />
@@ -159,6 +158,7 @@
     <ClInclude Include="Controller.h" />
     <ClInclude Include="FBXLoader.h" />
     <ClInclude Include="FlyCamera.h" />
+    <ClInclude Include="ShaderLoader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

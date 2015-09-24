@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "FlyCamera.h"
 #include "FBXLoader.h"
+#include "ShaderLoader.h"
 
 //#include <aie\Gizmos.h>
 
@@ -32,9 +33,9 @@ public:
 */
 	FBXLoader fbxData;
 
-	int imageWidth, imageHeight, imageFormat = 0;
-	unsigned char* data;
-	unsigned int programID, texDiffuse, texNormal , texSpecular = 0;
+	//int imageWidth, imageHeight, imageFormat = 0;
+	//unsigned char* data;
+	unsigned int programID = 0;
 
 	FlyCamera camera;
 
@@ -49,9 +50,5 @@ public:
 	//int getMeshCount();
 	//FBXMeshNode getMeshByIndex(int index);
 
-	unsigned int loadShader(unsigned int type, const std::string path);
-	unsigned int createShaderProgram(const std::string vertexShaderPath, const std::string fragmentShaderPath);
-	void freeShaderProgram();
-
-	unsigned int loadTexture(const std::string path);
+	//unsigned int loadTexture(const std::string path);
 };
