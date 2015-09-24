@@ -7,24 +7,27 @@ int AppFBX::oninit()
 	
 	programID = createShaderProgram("./VertexShader.txt", "./FragmentShader.txt");
 
-	texDiffuse = loadTexture("../fbx_models/soulspear/soulspear_diffuse.tga");
-	texSpecular = loadTexture("../fbx_models/soulspear/soulspear_specular.tga");
+	//texDiffuse = loadTexture("../fbx_models/soulspear/soulspear_diffuse.tga");
+	//texNormal = loadTexture("../fbx_models/soulspear/soulspear_normal.tga");
+	//texSpecular = loadTexture("../fbx_models/soulspear/soulspear_specular.tga");
 
-	loadFBX("../fbx_models/soulspear/soulspear.fbx");
+	fbxData.loadFBX("../fbx_models/soulspear/soulspear.fbx");
 	//std::cout << getMeshCount();
 
 
 	camera.setPerspective(glm::pi<float>() * 0.5f, 9.f / 16.f, .5f, 4000);
-	camera.setSpeed(25, 0.1f);
+	camera.setSpeed(5, 0.1f);
 
 	Gizmos::create();
+
+	setSky(vec3(0.1f, 0.1f, 0.1f));
 
 	return true;
 }
 void AppFBX::onkill()
 {
 	glDeleteProgram(programID);
-	freeFBX();
+	fbxData.freeFBX();
 	Gizmos::destroy();
 }
 bool AppFBX::onstep(float deltaTime)
@@ -37,38 +40,55 @@ void AppFBX::ondraw()
 {
 	//program
 	glUseProgram(programID);
+	//Vertex positioning
 	int projection = glGetUniformLocation(programID, "ProjectionView");
+	int model = glGetUniformLocation(programID, "Model");
+	//Ambient Light
 	int ambientLight = glGetUniformLocation(programID, "AmbientLight");
+	//Sun Light
 	int lightDirection = glGetUniformLocation(programID, "LightDirection");
 	int lightColor = glGetUniformLocation(programID, "LightColor");
+	//Specular Reflection
 	int cameraPosition = glGetUniformLocation(programID, "CameraPosition");
 	int specularPower = glGetUniformLocation(programID, "SpecularPower");
 
-	glUniformMatrix4fv(projection, 1, false, glm::value_ptr(camera.getProjectionView()));
-	glUniform3fv(ambientLight, 1, glm::value_ptr(glm::vec3(0.f)));
-	glUniform3fv(lightDirection, 1, glm::value_ptr( glm::normalize( glm::vec3(sin(getCurrentTime()), 1, 1) ) * 1.f ));
+	//VP
+	glUniformMatrix4fv(projection, 1, false, value_ptr(camera.getProjectionView()));
+	glUniformMatrix4fv(model, 1, false, value_ptr(rotate(getCurrentTime() / 5, vec3(0, -1, 0))) );
+	//Ambient
+	glUniform3fv(ambientLight, 1, glm::value_ptr(getSky()));
+	//DL
+	glUniform3fv(lightDirection, 1, glm::value_ptr( glm::normalize( glm::vec3(0, 1, 1) ) * 1.f ));
 	glUniform3fv(lightColor, 1, glm::value_ptr(glm::vec3(1, 1, 1)));
+	//SR
 	glUniform3fv(cameraPosition, 1, glm::value_ptr(camera.getWorldTransform()[3]));
-	glUniform1f(specularPower, 128.f);
+	glUniform1f(specularPower, 32.f);
 
 	//textures
-	int textureLoc = glGetUniformLocation(programID, "Diffuse");
+	int textureLoc = glGetUniformLocation(programID, "DiffuseMap");
 	glUniform1i(textureLoc, 0);
 
-	textureLoc = glGetUniformLocation(programID, "Specular");
+	textureLoc = glGetUniformLocation(programID, "NormalMap");
 	glUniform1i(textureLoc, 1);
-	
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texDiffuse);
 
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, texSpecular);
+	textureLoc = glGetUniformLocation(programID, "SpecularMap");
+	glUniform1i(textureLoc, 2);
 	
 	//draw
-	for (unsigned int i = 0; i < glInfo.size(); i++)
+	for (unsigned int i = 0; i < fbxData.glInfo.size(); i++)
 	{
-		glBindVertexArray(glInfo[i].VAO);
-		glDrawElements(GL_TRIANGLES, glInfo[i].indexCount, GL_UNSIGNED_INT, 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, fbxData.glInfo[i].diffuse);
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, fbxData.glInfo[i].normal);
+
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, fbxData.glInfo[i].specular);
+
+
+		glBindVertexArray(fbxData.glInfo[i].VAO);
+		glDrawElements(GL_TRIANGLES, fbxData.glInfo[i].indexCount, GL_UNSIGNED_INT, 0);
 	}
 
 	//Gizmos ---------------------------
@@ -86,6 +106,7 @@ void AppFBX::ondraw()
 	
 }
 
+/*..
 void AppFBX::loadFBX(const char* path)
 {
 	file.load(path);
@@ -111,10 +132,12 @@ void AppFBX::loadFBX(const char* path)
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(2);
+		glEnableVertexAttribArray(3);
 
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(FBXVertex), 0);
+		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(FBXVertex), (void*)FBXVertex::Offsets::PositionOffset);
 		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(FBXVertex), (void*)FBXVertex::Offsets::NormalOffset);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(FBXVertex), (void*)FBXVertex::Offsets::TexCoord1Offset);
+		glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(FBXVertex), (void*)FBXVertex::Offsets::TangentOffset);
+		glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(FBXVertex), (void*)FBXVertex::Offsets::TexCoord1Offset);
 
 		//index
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glInfo[i].IBO);
@@ -135,7 +158,7 @@ int AppFBX::getMeshCount()
 {
 	return file.getMeshCount();
 }
-
+*/
 
 unsigned int AppFBX::loadShader(unsigned int type, const std::string path)
 {

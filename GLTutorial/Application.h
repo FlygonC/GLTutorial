@@ -19,8 +19,11 @@ private:
 	float currentTime = 0;
 	float deltaTime = 0;
 	float lastTime = 0;
+	vec3 skyColor = vec3(0);
 
 	bool startGL();
+
+	
 
 protected:
 	GLFWwindow *window;
@@ -32,6 +35,8 @@ protected:
 	virtual bool onstep(float deltaTime) { return false; }
 	virtual void ondraw() {}
 
+	void setSky(vec3 color);
+
 public:
 	
 	int  init();
@@ -41,4 +46,6 @@ public:
 
 	float getDeltaTime();
 	float getCurrentTime();
+	
+	vec3 getSky();
 };

@@ -26,7 +26,7 @@ bool Application::startGL()
 	const int minor = ogl_GetMinorVersion();
 	printf("GL: %i.%i\n", major, minor);
 
-	glClearColor(0.f, 0.f, 0.f, 1);
+	glClearColor(skyColor.x, skyColor.y, skyColor.z, 1);
 	glEnable(GL_DEPTH_TEST);
 
 	view = glm::lookAt(vec3(109 * 6, 109 * 6, 0), vec3(0), vec3(0, 1, 0));
@@ -77,6 +77,7 @@ bool Application::step()
 void Application::draw()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearColor(skyColor.x, skyColor.y, skyColor.z, 1);
 	ondraw();
 	glfwSwapBuffers(window);
 }
@@ -88,4 +89,13 @@ float Application::getDeltaTime()
 float Application::getCurrentTime()
 {
 	return currentTime;
+}
+
+void Application::setSky(vec3 color)
+{
+	skyColor = color;
+}
+vec3 Application::getSky()
+{
+	return skyColor;
 }

@@ -57,6 +57,12 @@
     <ClCompile Include="..\includes\aie\Gizmos.cpp">
       <Filter>Source Files\Includes</Filter>
     </ClCompile>
+    <ClCompile Include="AppDeferred.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FBXLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h">
@@ -106,6 +112,12 @@
     </ClInclude>
     <ClInclude Include="..\includes\tiny_obj_loader.h">
       <Filter>Header Files\Includes</Filter>
+    </ClInclude>
+    <ClInclude Include="AppDeferred.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FBXLoader.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
