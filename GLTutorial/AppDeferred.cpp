@@ -69,7 +69,6 @@ void AppDeferred::ondraw()
 	//draw to frame buffer 1111111111
 	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
 	glViewport(0, 0, 512*2, 512*2);
-	glClearColor(getSky().x, getSky().y, getSky().z, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	camera.setPerspective(glm::pi<float>() * 0.5f, 1.f / 1.f, .5f, 4000);
@@ -91,7 +90,6 @@ void AppDeferred::ondraw()
 	//draw normal 2222222222222
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, getWidth(), getHeight());
-	glClearColor(getSky().x, getSky().y, getSky().z, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	camera.setPerspective(glm::pi<float>() * 0.5f, 9.f / 16.f, .5f, 4000);
