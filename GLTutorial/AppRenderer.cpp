@@ -74,7 +74,7 @@ int AppRenderer::oninit()
 
 
 	camera.setPerspective(glm::pi<float>() * 0.4f, 9.f / 16.f, .5f, 4000);
-	camera.setSpeed(100, 0.1);
+	camera.setSpeed(100, 0.1f);
 
 	return true;
 }

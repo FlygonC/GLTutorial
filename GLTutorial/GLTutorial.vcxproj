@@ -160,6 +160,9 @@
     <ClInclude Include="FlyCamera.h" />
     <ClInclude Include="ShaderLoader.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\dependencies\glfw3.lib" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

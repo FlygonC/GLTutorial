@@ -1,6 +1,6 @@
 //#include "AppPlanets.h"
 //#include "AppRenderer.h"
-#include "AppFBX.h"
+//#include "AppFBX.h"
 #include "AppDeferred.h"
 
 int main()

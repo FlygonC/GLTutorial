@@ -33,9 +33,6 @@
     <ClCompile Include="FlyCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Application.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Controller.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -63,11 +60,11 @@
     <ClCompile Include="ShaderLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Application.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Application.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="AppPlanets.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -119,5 +116,13 @@
     <ClInclude Include="ShaderLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Application.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\dependencies\glfw3.lib">
+      <Filter>Resource Files</Filter>
+    </Library>
   </ItemGroup>
 </Project>
