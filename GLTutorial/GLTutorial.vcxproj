@@ -128,7 +128,7 @@
     <ClCompile Include="..\includes\aie\Gizmos.cpp" />
     <ClCompile Include="..\includes\gl_core_4_4.c" />
     <ClCompile Include="..\includes\tiny_obj_loader.cc" />
-    <ClCompile Include="AppDeferred.cpp" />
+    <ClCompile Include="AppRenderTarget.cpp" />
     <ClCompile Include="AppFBX.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="AppPlanets.cpp" />
@@ -149,7 +149,7 @@
     <ClInclude Include="..\includes\gl_core_4_4.h" />
     <ClInclude Include="..\includes\stb_image.h" />
     <ClInclude Include="..\includes\tiny_obj_loader.h" />
-    <ClInclude Include="AppDeferred.h" />
+    <ClInclude Include="AppRenderTarget.h" />
     <ClInclude Include="AppFBX.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="AppPlanets.h" />
@@ -161,6 +161,7 @@
     <ClInclude Include="ShaderLoader.h" />
   </ItemGroup>
   <ItemGroup>
+    <Library Include="..\dependencies\FBXLoader_d.lib" />
     <Library Include="..\dependencies\glfw3.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -5,13 +5,6 @@
 #include "FBXLoader.h"
 #include "ShaderLoader.h"
 
-//#include <aie\Gizmos.h>
-
-#include <stb_image.h>
-#include <FBXFile.h>
-//#include <tiny_obj_loader.h>
-#include <vector>
-#include <fstream>
 
 struct SimpleQuad
 {
@@ -112,10 +105,10 @@ struct SimpleQuad
 	}
 };
 
-class AppDeferred : public Application
+class AppRenderTarget : public Application
 {
 public:
-	AppDeferred();
+	AppRenderTarget();
 
 	unsigned int FBO, FBOTexture, FBODepth;
 	unsigned int FBXShader;

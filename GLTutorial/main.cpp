@@ -1,12 +1,12 @@
 //#include "AppPlanets.h"
 //#include "AppRenderer.h"
 //#include "AppFBX.h"
-#include "AppDeferred.h"
+#include "AppRenderTarget.h"
 
 int main()
 {
-	Application *App = new AppDeferred();
-	if (App->init(1600, 900, "Application"))
+	Application *App = new AppRenderTarget();
+	if (App->init(1280, 720, "Application"))
 	{
 		while (App->step())
 		{

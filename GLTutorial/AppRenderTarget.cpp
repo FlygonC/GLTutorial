@@ -1,11 +1,11 @@
-#include "AppDeferred.h"
+#include "AppRenderTarget.h"
 
-AppDeferred::AppDeferred()
+AppRenderTarget::AppRenderTarget()
 {
 
 }
 
-int AppDeferred::oninit()
+int AppRenderTarget::oninit()
 {
 	//gen fbo
 	glGenFramebuffers(1, &FBO);
@@ -14,7 +14,7 @@ int AppDeferred::oninit()
 	glGenTextures(1, &FBOTexture);
 	glBindTexture(GL_TEXTURE_2D, FBOTexture);
 	//texture things
-	glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, 512*2, 512*2);
+	glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, 512, 512);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	//attach texture
@@ -22,7 +22,7 @@ int AppDeferred::oninit()
 	//gen render buffer
 	glGenRenderbuffers(1, &FBODepth);
 	glBindRenderbuffer(GL_RENDERBUFFER, FBODepth);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512*2, 512*2);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512, 512);
 	//render buffer attach
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, FBODepth);
 
@@ -52,23 +52,23 @@ int AppDeferred::oninit()
 
 	return true;
 }
-void AppDeferred::onkill()
+void AppRenderTarget::onkill()
 {
 	ShaderLoader::freeShaderProgram(FBXShader);
 	fbxData.freeFBX();
 	Gizmos::destroy();
 }
 
-bool AppDeferred::onstep(float deltaTime)
+bool AppRenderTarget::onstep(float deltaTime)
 {
 	camera.update(deltaTime);
 	return true;
 }
-void AppDeferred::ondraw()
+void AppRenderTarget::ondraw()
 {
 	//draw to frame buffer 1111111111
 	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-	glViewport(0, 0, 512*2, 512*2);
+	glViewport(0, 0, 512, 512);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	camera.setPerspective(glm::pi<float>() * 0.5f, 1.f / 1.f, .5f, 4000);
@@ -111,7 +111,7 @@ void AppDeferred::ondraw()
 	Gizmos::draw(camera.getProjectionView());
 }
 
-void AppDeferred::FBXDraw()
+void AppRenderTarget::FBXDraw()
 {
 	//program
 	glUseProgram(FBXShader);
@@ -133,7 +133,7 @@ void AppDeferred::FBXDraw()
 	//Ambient
 	glUniform3fv(ambientLight, 1, glm::value_ptr(getSky()));
 	//DL
-	glUniform3fv(lightDirection, 1, glm::value_ptr(glm::normalize(glm::vec3(0, 1, 1)) * 1.f));
+	glUniform3fv(lightDirection, 1, glm::value_ptr(glm::normalize(glm::vec3(0, 1, 1))));
 	glUniform3fv(lightColor, 1, glm::value_ptr(glm::vec3(1, 1, 1)));
 	//SR
 	glUniform3fv(cameraPosition, 1, glm::value_ptr(camera.getWorldTransform()[3]));
