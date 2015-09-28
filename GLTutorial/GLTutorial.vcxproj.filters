@@ -63,6 +63,9 @@
     <ClCompile Include="AppRenderTarget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AppPostProcess.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppPlanets.h">
@@ -117,6 +120,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AppRenderTarget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AppPostProcess.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

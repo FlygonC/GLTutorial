@@ -23,14 +23,13 @@ struct SimpleQuad
 	void create()
 	{
 		float vertexData[] = {
-			-5, 0,  -5, 1, 0, 0,
-			5, 0,  -5, 1, 1, 0,
-			5, 10, -5, 1, 1, 1,
-			-5, 10, -5, 1, 0, 1,
+			-5, 0,  -5, 1, 0, 0,//bot left 0
+			5, 0,  -5, 1, 1, 0,//bot right 1
+			5, 10, -5, 1, 1, 1,//top right 2
+			-5, 10, -5, 1, 0, 1,//top left 3
 		};
 		unsigned int indexData[] = {
-			0, 1, 2,
-			0, 2, 3,
+			0, 3, 1, 2,
 		};
 
 		glGenVertexArrays(1, &VAO);
@@ -42,7 +41,7 @@ struct SimpleQuad
 
 		glGenBuffers(1, &IBO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * 6, indexData, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * 4, indexData, GL_STATIC_DRAW);
 
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 6, 0);
@@ -97,7 +96,7 @@ struct SimpleQuad
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
 
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, 0);
 
 		glUseProgram(0);
 		glBindVertexArray(0);
