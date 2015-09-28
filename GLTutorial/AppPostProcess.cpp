@@ -13,6 +13,9 @@ int AppPostProcess::oninit()
 	camera.setPerspective(glm::pi<float>() * 0.5f, 9.f / 16.f, .5f, 4000);
 	camera.setSpeed(5, 0.1f);
 
+	sky.create(16.f, 9.f);
+	sky.loadTexture("../resources/skyimagetest.png");
+
 	Gizmos::create();
 	setSky(vec3(1.f, 1.f, 1.f));
 
@@ -40,7 +43,7 @@ void AppPostProcess::ondraw()
 	// clear the target
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	// draw our 3D scene
-	// gizmos for now
+	sky.draw(camera.rotationX, camera.rotationY);
 	//Gizmos ---------------------------
 	Gizmos::clear();
 	Gizmos::addTransform(glm::mat4(1));
@@ -52,7 +55,8 @@ void AppPostProcess::ondraw()
 		Gizmos::addLine(vec3(-10 + i, 0, 10), vec3(-10 + i, 0, -10), i == 10 ? white : black);
 		Gizmos::addLine(vec3(10, 0, -10 + i), vec3(-10, 0, -10 + i), i == 10 ? white : black);
 	}
-	Gizmos::draw(camera.getProjectionView());	FBXDraw();
+	Gizmos::draw(camera.getProjectionView());
+	FBXDraw();
 
 
 

@@ -4,6 +4,7 @@
 #include "FlyCamera.h"
 #include "FBXLoader.h"
 #include "ShaderLoader.h"
+#include "Sky.h"
 
 struct SimpleFrameBuffer
 {
@@ -26,6 +27,8 @@ struct SimpleFrameBuffer
 		glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, screenWidth, screenHeight);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texture, 0);
 
 		glGenRenderbuffers(1, &depth);
@@ -118,6 +121,7 @@ public:
 
 	FBXLoader fbxData;
 	FlyCamera camera;
+	Sky sky;
 
 	unsigned int FBXShader;
 

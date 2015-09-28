@@ -92,8 +92,9 @@ vec4 Greyscale()
 }
 
 void main() {
+	FragColour = Simple();
 	//FragColour = BoxBlur();
 	//FragColour = Distort();
-	FragColour = vec4(IsEdge(fTexCoord), IsEdge(fTexCoord), IsEdge(fTexCoord), 1);
+	//FragColour = vec4(IsEdge(fTexCoord), IsEdge(fTexCoord), IsEdge(fTexCoord), 1);
 	//FragColour = Greyscale();
 }

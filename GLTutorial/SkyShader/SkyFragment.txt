@@ -1,0 +1,15 @@
+#version 410
+
+in vec2 fTexCoord;
+in float fViewX;
+in float fViewY;
+
+out vec4 FragColour;
+
+uniform sampler2D image;
+
+void main() {
+	vec2 finalCoords = fTexCoord + (vec2(0,90) + vec2((-fViewX / 2), fViewY)) / 180.;
+
+	FragColour = texture(image, finalCoords);
+}
