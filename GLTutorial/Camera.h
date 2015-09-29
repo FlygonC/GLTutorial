@@ -14,7 +14,7 @@ protected:
 	mat4 projectionTransform = mat4(0);
 	//mat4 projectionViewTransform = mat4(0);
 public:
-	virtual void update(float dt) = 0;
+	virtual void update(float dt) {}
 	void setPerspective(float fov, float aspectRatio, float pnear, float pfar);
 	void setLookAt(vec3 from, vec3 to, vec3 up);
 	void setPosition(vec3 position);

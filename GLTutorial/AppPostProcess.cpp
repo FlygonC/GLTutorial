@@ -10,14 +10,22 @@ int AppPostProcess::oninit()
 	FBXShader = ShaderLoader::createShaderProgram("./VertexShader.txt", "./FragmentShader.txt");
 	fbxData.loadFBX("../fbx_models/soulspear/soulspear.fbx");
 
-	camera.setPerspective(glm::pi<float>() * 0.5f, 9.f / 16.f, .5f, 4000);
+	camera.setPerspective(glm::pi<float>() * 0.5f, 9.f / 16.f, .5f, 1000);
 	camera.setSpeed(5, 0.1f);
 
 	sky.create(16.f, 9.f);
 	sky.loadTexture("../resources/skyimagetest.png");
 
+	box.create();
+	box.loadCubeMap("../resources/sky1/lagoon_rt.tga",
+		"../resources/sky1/lagoon_lf.tga",
+		"../resources/sky1/lagoon_up.tga",
+		"../resources/sky1/lagoon_dn.tga",
+		"../resources/sky1/lagoon_bk.tga",
+		"../resources/sky1/lagoon_ft.tga");
+
 	Gizmos::create();
-	setSky(vec3(1.f, 1.f, 1.f));
+	setSky(vec3(0.5f, 0.5f, 0.5f));
 
 	return true;
 }
@@ -43,7 +51,8 @@ void AppPostProcess::ondraw()
 	// clear the target
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	// draw our 3D scene
-	sky.draw(camera.rotationX, camera.rotationY);
+	//sky.draw(camera.rotationX, camera.rotationY);
+	box.draw(camera);
 	//Gizmos ---------------------------
 	Gizmos::clear();
 	Gizmos::addTransform(glm::mat4(1));
@@ -92,7 +101,7 @@ void AppPostProcess::FBXDraw()
 	//Ambient
 	glUniform3fv(ambientLight, 1, glm::value_ptr(getSky()));
 	//DL
-	glUniform3fv(lightDirection, 1, glm::value_ptr(glm::normalize(glm::vec3(0, 1, 1))));
+	glUniform3fv(lightDirection, 1, glm::value_ptr(glm::normalize(glm::vec3(1.f, 0.6f, -1.f))));
 	glUniform3fv(lightColor, 1, glm::value_ptr(glm::vec3(1, 1, 1)));
 	//SR
 	glUniform3fv(cameraPosition, 1, glm::value_ptr(camera.getWorldTransform()[3]));

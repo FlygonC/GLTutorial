@@ -141,6 +141,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ShaderLoader.cpp" />
     <ClCompile Include="Sky.cpp" />
+    <ClCompile Include="SkyBox.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\includes\aie\Gizmos.h" />
@@ -163,6 +164,7 @@
     <ClInclude Include="FlyCamera.h" />
     <ClInclude Include="ShaderLoader.h" />
     <ClInclude Include="Sky.h" />
+    <ClInclude Include="SkyBox.h" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\dependencies\FBXLoader_d.lib" />

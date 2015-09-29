@@ -5,6 +5,7 @@
 #include "FBXLoader.h"
 #include "ShaderLoader.h"
 #include "Sky.h"
+#include "SkyBox.h"
 
 struct SimpleFrameBuffer
 {
@@ -122,6 +123,7 @@ public:
 	FBXLoader fbxData;
 	FlyCamera camera;
 	Sky sky;
+	SkyBox box;
 
 	unsigned int FBXShader;
 
