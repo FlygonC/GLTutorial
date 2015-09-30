@@ -152,6 +152,7 @@
     <ClInclude Include="..\includes\gl_core_4_4.h" />
     <ClInclude Include="..\includes\stb_image.h" />
     <ClInclude Include="..\includes\tiny_obj_loader.h" />
+    <ClInclude Include="AppDeferredStart.h" />
     <ClInclude Include="AppPostProcess.h" />
     <ClInclude Include="AppRenderTarget.h" />
     <ClInclude Include="AppFBX.h" />
@@ -162,6 +163,7 @@
     <ClInclude Include="Controller.h" />
     <ClInclude Include="FBXLoader.h" />
     <ClInclude Include="FlyCamera.h" />
+    <ClInclude Include="GLUtilities.h" />
     <ClInclude Include="ShaderLoader.h" />
     <ClInclude Include="Sky.h" />
     <ClInclude Include="SkyBox.h" />

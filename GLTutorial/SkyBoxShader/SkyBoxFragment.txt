@@ -7,5 +7,7 @@ out vec4 FragColour;
 uniform samplerCube cubeMap;
 
 void main() {
-	FragColour = texture(cubeMap, fTexCoord);
+	vec3 finalCoord = vec3(fTexCoord.x, fTexCoord.y, -fTexCoord.z);
+
+	FragColour = texture(cubeMap, finalCoord);
 }

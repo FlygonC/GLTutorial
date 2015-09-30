@@ -4,7 +4,7 @@ AppPostProcess::AppPostProcess() {}
 
 int AppPostProcess::oninit()
 {
-	FBO.create(getWidth(), getHeight());
+	render.create(getWidth(), getHeight());
 	screen.create(getWidth(), getHeight());
 
 	FBXShader = ShaderLoader::createShaderProgram("./VertexShader.txt", "./FragmentShader.txt");
@@ -13,8 +13,8 @@ int AppPostProcess::oninit()
 	camera.setPerspective(glm::pi<float>() * 0.5f, 9.f / 16.f, .5f, 1000);
 	camera.setSpeed(5, 0.1f);
 
-	sky.create(16.f, 9.f);
-	sky.loadTexture("../resources/skyimagetest.png");
+	//sky.create(16.f, 9.f);
+	//sky.loadTexture("../resources/skyimagetest.png");
 
 	box.create();
 	box.loadCubeMap("../resources/sky1/lagoon_rt.tga",
@@ -25,7 +25,7 @@ int AppPostProcess::oninit()
 		"../resources/sky1/lagoon_ft.tga");
 
 	Gizmos::create();
-	setSky(vec3(0.5f, 0.5f, 0.5f));
+	setSky(vec3(0.1f, 0.1f, 0.3f));
 
 	return true;
 }
@@ -46,7 +46,7 @@ bool AppPostProcess::onstep(float deltaTime)
 void AppPostProcess::ondraw()
 {
 	// bind our target
-	glBindFramebuffer(GL_FRAMEBUFFER, FBO.frame);
+	glBindFramebuffer(GL_FRAMEBUFFER, render.FBO);
 	glViewport(0, 0, getWidth(), getHeight());
 	// clear the target
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -75,7 +75,7 @@ void AppPostProcess::ondraw()
 	// each pixel will be filled
 	glClear(GL_DEPTH_BUFFER_BIT);
 	// draw out full-screen quad
-	screen.texture = FBO.texture;
+	screen.texture = render.texture;
 	screen.draw();
 }
 
@@ -101,7 +101,7 @@ void AppPostProcess::FBXDraw()
 	//Ambient
 	glUniform3fv(ambientLight, 1, glm::value_ptr(getSky()));
 	//DL
-	glUniform3fv(lightDirection, 1, glm::value_ptr(glm::normalize(glm::vec3(1.f, 0.6f, -1.f))));
+	glUniform3fv(lightDirection, 1, glm::value_ptr(glm::normalize(glm::vec3(1.f, 0.7f, 0.9f))));
 	glUniform3fv(lightColor, 1, glm::value_ptr(glm::vec3(1, 1, 1)));
 	//SR
 	glUniform3fv(cameraPosition, 1, glm::value_ptr(camera.getWorldTransform()[3]));
