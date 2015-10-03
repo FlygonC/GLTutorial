@@ -106,3 +106,7 @@ int FBXLoader::getMeshCount()
 	return file.getMeshCount();
 }
 
+FBXMeshNode* FBXLoader::getMeshByIndex(int index)
+{
+	return file.getMeshByIndex(index);
+}

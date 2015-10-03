@@ -128,6 +128,7 @@
     <ClCompile Include="..\includes\aie\Gizmos.cpp" />
     <ClCompile Include="..\includes\gl_core_4_4.c" />
     <ClCompile Include="..\includes\tiny_obj_loader.cc" />
+    <ClCompile Include="AppDeferredStart.cpp" />
     <ClCompile Include="AppPostProcess.cpp" />
     <ClCompile Include="AppRenderTarget.cpp" />
     <ClCompile Include="AppFBX.cpp" />

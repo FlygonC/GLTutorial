@@ -1,0 +1,38 @@
+#version 410
+
+in vec2 fTexCoord;
+
+out vec3 LightOutput;
+
+// direction in view-space
+uniform vec3 lightDirection;
+uniform vec3 lightDiffuse;
+
+uniform vec3 cameraPosition;
+
+uniform sampler2D positionTexture;
+uniform sampler2D normalTexture;
+uniform sampler2D specularMap;
+
+void main() {
+	vec3 normal = normalize( texture(normalTexture, fTexCoord).xyz );
+	vec3 position = texture(positionTexture, fTexCoord).xyz;
+	
+	float d = max(0, dot(normal, normalize(lightDirection)));
+	
+	//Specular Calculation
+	vec3 specular = texture(specularMap, fTexCoord).xyz;
+	float specularPower = texture(specularMap, fTexCoord).a;
+	
+	vec3 V = normalize( cameraPosition - position );
+	vec3 Rm = reflect( -lightDirection, normal );
+	
+	float is = max( 0, dot(V, Rm) );
+	is = pow( is, specularPower );
+	
+	//Output
+	LightOutput = lightDiffuse * (
+					(d)
+					+ ((specular) * is)
+					);
+}

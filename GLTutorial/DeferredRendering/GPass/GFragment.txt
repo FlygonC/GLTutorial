@@ -1,0 +1,43 @@
+#version 410
+
+in vec4 vPosition;
+
+in vec4 vNormal;
+in vec4 vTangent;
+in vec3 vBiTangent;
+
+in vec2 vTexCoord;
+
+layout(location = 0) out vec3 gpassAlbedo;
+layout(location = 1) out vec3 gpassPosition;
+layout(location = 2) out vec3 gpassNormal;
+layout(location = 3) out vec4 gpassSpecular;
+
+uniform mat4 View;
+
+uniform sampler2D diffuseMap;
+uniform sampler2D normalMap;
+uniform sampler2D specularMap;
+
+void main() {
+	// we simply output the data
+	
+	//Color
+	gpassAlbedo = texture(diffuseMap, vTexCoord).xyz;
+//	gpassAlbedo = vec3(1);
+	
+	//Position
+	gpassPosition = vPosition.xyz;
+	
+	//Normals
+	mat3 TBN = mat3(normalize( vTangent ).xyz, 
+					normalize( vBiTangent ), 
+					normalize( vNormal ).xyz);
+	vec3 N = texture( normalMap, vTexCoord ).xyz * 2 - 1;
+	gpassNormal = (View * vec4(TBN * N,0)).xyz;
+
+	//Specular
+	gpassSpecular.xyz = texture(specularMap, vTexCoord).xyz;
+//	gpassSpecular.xyz = vec3(1);
+	gpassSpecular.a = 32;
+}

@@ -22,5 +22,5 @@ public:
 	void loadFBX(const char* path);
 	void freeFBX();
 	int getMeshCount();
-	//FBXMeshNode getMeshByIndex(int index);
+	FBXMeshNode* getMeshByIndex(int index);
 };

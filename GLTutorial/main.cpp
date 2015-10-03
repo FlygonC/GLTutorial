@@ -3,10 +3,11 @@
 //#include "AppFBX.h"
 #include "AppRenderTarget.h"
 #include "AppPostProcess.h"
+#include "AppDeferredStart.h"
 
 int main()
 {
-	Application *App = new AppPostProcess();
+	Application *App = new AppDeferredStart();
 	if (App->init(1280, 720, "Application"))
 	{
 		while (App->step())
