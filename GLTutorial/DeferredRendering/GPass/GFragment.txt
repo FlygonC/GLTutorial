@@ -24,7 +24,7 @@ void main() {
 	
 	//Color
 	gpassAlbedo = texture(diffuseMap, vTexCoord).xyz;
-//	gpassAlbedo = vec3(1);
+//	gpassAlbedo = vec3(0);
 	
 	//Position
 	gpassPosition = vPosition.xyz;
@@ -38,6 +38,6 @@ void main() {
 
 	//Specular
 	gpassSpecular.xyz = texture(specularMap, vTexCoord).xyz;
-//	gpassSpecular.xyz = vec3(1);
-	gpassSpecular.a = 32;
+//	gpassSpecular.xyz = vec3(1, 1, 1);
+	gpassSpecular.a = 32 / 4;
 }

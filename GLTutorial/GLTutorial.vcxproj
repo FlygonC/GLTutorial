@@ -160,6 +160,7 @@
     <ClInclude Include="Application.h" />
     <ClInclude Include="AppPlanets.h" />
     <ClInclude Include="AppRenderer.h" />
+    <ClInclude Include="AssetManager.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Controller.h" />
     <ClInclude Include="FBXLoader.h" />

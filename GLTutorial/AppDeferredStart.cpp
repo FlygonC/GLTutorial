@@ -113,7 +113,7 @@ void AppDeferredStart::ondraw()
 	glBindTexture(GL_TEXTURE_2D, gPass.specularMap);
 	// draw Directional lights as fullscreen quads
 
-	drawDirectionalLight(glm::vec3(0, 1, 1), glm::vec3(1.0f));
+//	drawDirectionalLight(glm::vec3(0, 1, 1), glm::vec3(1.0f));
 	//drawDirectionalLight(glm::vec3(0, -1, 0), glm::vec3(0, 0, 0.2f));
 
 	//Finish Directional Lights
@@ -150,8 +150,8 @@ void AppDeferredStart::ondraw()
 
 	float t = (float)glfwGetTime();
 	//drawPointLight(glm::vec3(0, 6, 0), 6, glm::vec3(0, 1, 0));
-	drawPointLight(glm::vec3(sin(t) * 2, 0, cos(t) * 2), 4, glm::vec3(1, 0, 0));
-	//drawPointLight(glm::vec3(3, 0, 0), 6, glm::vec3(0, 0, 1));
+//	drawPointLight(glm::vec3(sin(t) * 2, 2, cos(t) * 2), 5, glm::vec3(1.0f));
+	drawPointLight(glm::vec3(0, 2, 2), 5, glm::vec3(1.0f));
 
 	glCullFace(GL_BACK);
 	glDisable(GL_CULL_FACE);

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <tiny_obj_loader.h>
+
 #include "Application.h"
 #include "FlyCamera.h"
 #include "FBXLoader.h"

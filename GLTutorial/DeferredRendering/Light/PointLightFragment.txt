@@ -13,6 +13,8 @@ uniform sampler2D positionTexture;
 uniform sampler2D normalTexture;
 uniform sampler2D specularMap;
 
+layout(location = 0) out vec3 lightTexture;
+
 void main() {
 	// calculate the texture coordinates for the fragment
 	vec2 texCoord = gl_FragCoord.xy / textureSize(positionTexture, 0).xy;
@@ -26,6 +28,8 @@ void main() {
 	
 	// simple linear falloff
 	float falloff = 1 - min(1, length(toLight) / lightRadius);
+	// Exponential falloff
+//	float falloff = 1 - min(1, (length(toLight) * length(toLight)) / lightRadius);
 	
 	//Specular Calculation
 	vec3 specular = texture(specularMap, texCoord).xyz;
@@ -34,12 +38,12 @@ void main() {
 	vec3 V = normalize( cameraPosition - position );
 	vec3 Rm = reflect( -toLight, normal );
 	
-	float is = max( 0, dot(V, Rm) );
-	is = pow( is * falloff, specularPower );
+	float is = max( 0, dot(V, Rm) ) * falloff;
+	is = pow( is, specularPower );
 	
 	//Output
-	LightOutput = lightDiffuse * (
-					(d) 
-					+ ((specular) * is)
+	lightTexture = (
+					(lightDiffuse * (d)) 
+					+ ((lightDiffuse * specular) * is)
 					) * falloff;
 }

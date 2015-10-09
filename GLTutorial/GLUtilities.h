@@ -6,6 +6,14 @@
 
 #include "ShaderLoader.h"
 
+struct OpenGLInfo
+{
+	unsigned int VAO;
+	unsigned int VBO;
+	unsigned int IBO;
+	unsigned int indexCount;
+};
+
 struct SimpleFrameBuffer
 {
 	unsigned int FBO, texture, depth;
@@ -95,7 +103,7 @@ struct GPassFrameBuffer
 
 struct LightFrameBuffer
 {
-	unsigned int FBO, lightTexture;
+	unsigned int FBO, lightTexture, specularTexture;
 
 	void create(int width, int height)
 	{
@@ -111,7 +119,7 @@ struct LightFrameBuffer
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lightTexture, 0);
 
-		GLenum lightTargets[] = {GL_COLOR_ATTACHMENT0};
+		GLenum lightTargets[] = { GL_COLOR_ATTACHMENT0 };
 		glDrawBuffers(1, lightTargets);
 		auto status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 		if (status != GL_FRAMEBUFFER_COMPLETE)
