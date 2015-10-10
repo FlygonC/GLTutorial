@@ -14,6 +14,7 @@ uniform sampler2D normalTexture;
 uniform sampler2D specularMap;
 
 layout(location = 0) out vec3 lightTexture;
+layout(location = 1) out vec3 specularTexture;
 
 void main() {
 	// calculate the texture coordinates for the fragment
@@ -36,14 +37,12 @@ void main() {
 	float specularPower = texture(specularMap, texCoord).a;
 	
 	vec3 V = normalize( cameraPosition - position );
-	vec3 Rm = reflect( -toLight, normal );
+	vec3 Rm = reflect( -normalize(toLight), normal );
 	
-	float is = max( 0, dot(V, Rm) ) * falloff;
+	float is = max( 0, dot(V, Rm) );
 	is = pow( is, specularPower );
 	
 	//Output
-	lightTexture = (
-					(lightDiffuse * (d)) 
-					+ ((lightDiffuse * specular) * is)
-					) * falloff;
+	lightTexture = (lightDiffuse * d) * falloff;
+	specularTexture = (lightDiffuse * is) * falloff;
 }

@@ -18,7 +18,7 @@ int AppDeferredStart::oninit()
 	testQuad2.create(getWidth(), getHeight(), 0.15f);
 
 	fbxData.loadFBX("../fbx_models/soulspear/soulspear.fbx");
-	camera.setPerspective(glm::pi<float>() * 0.5f, 9.f / 16.f, .5f, 1000);
+	camera.setPerspective(glm::pi<float>() * 0.5f, 9.f / 16.f, .5f, 200);
 	camera.setSpeed(5, 0.1f);
 
 	Gizmos::create();
@@ -151,7 +151,7 @@ void AppDeferredStart::ondraw()
 	float t = (float)glfwGetTime();
 	//drawPointLight(glm::vec3(0, 6, 0), 6, glm::vec3(0, 1, 0));
 //	drawPointLight(glm::vec3(sin(t) * 2, 2, cos(t) * 2), 5, glm::vec3(1.0f));
-	drawPointLight(glm::vec3(0, 2, 2), 5, glm::vec3(1.0f));
+	drawPointLight(glm::vec3(2, 2, 2), 10, glm::vec3(1.0f));
 
 	glCullFace(GL_BACK);
 	glDisable(GL_CULL_FACE);
@@ -176,11 +176,21 @@ void AppDeferredStart::ondraw()
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, lightPass.lightTexture);
 
+	loc = glGetUniformLocation(compProgram, "specularTexture");
+	glUniform1i(loc, 2);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, gPass.specularMap);
+
+	loc = glGetUniformLocation(compProgram, "specularity");
+	glUniform1i(loc, 3);
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, lightPass.specularTexture);
+
 	compositeQuad.draw();
 
-	testQuad.texture = lightPass.lightTexture;
+	testQuad.texture = lightPass.specularTexture;
 	testQuad.draw();
-	testQuad2.texture = gPass.specularMap;
+	testQuad2.texture = lightPass.lightTexture;
 	testQuad2.draw();
 }
 

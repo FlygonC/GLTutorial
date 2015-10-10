@@ -2,15 +2,20 @@
 #include <unordered_map>
 #include <string>
 
+#include <gl_core_4_4.h>
+#include <stb_image.h>
+
+#include "ShaderLoader.h"
+
 namespace AssetLibrary
 {
 	namespace ASSET
 	{
-		enum GL_Handel_Type { NONE = 0, VAO, VBO, IBO, SIZE, FBO, RBO, TEXTURE, SHADER, eSIZE };
+		enum GL_Handle_Type { NONE = 0, VAO, VBO, IBO, SIZE, FBO, RBO, TEXTURE, SHADER, eSIZE };
 	}
 
-	typedef std::pair<ASSET::GL_Handel_Type, std::string> AssetKey;
-	typedef unsigned int GL_Handel;
+	typedef std::pair<ASSET::GL_Handle_Type, std::string> AssetKey;
+	typedef unsigned int GL_Handle;
 
 	class AssetManager
 	{
@@ -23,13 +28,13 @@ namespace AssetLibrary
 		};
 
 		//Map to hold Handels
-		std::unordered_map<AssetKey, GL_Handel, Hash> handels;
+		std::unordered_map<AssetKey, GL_Handle, Hash> handles;
 
 		AssetManager() {  }
 
-		GL_Handel getVerified(const AssetKey &key) const;
+		GL_Handle getVerified(const AssetKey &key) const;
 
-		bool setInternal(ASSET::GL_Handel_Type type, char* name, GL_Handel);
+		bool setInternal(ASSET::GL_Handle_Type type, const char* name, GL_Handle);
 
 	public:
 		static AssetManager &instance()
@@ -38,35 +43,35 @@ namespace AssetLibrary
 			return a;
 		}
 		//Get Asset
-		GL_Handel get(ASSET::GL_Handel_Type type, const char* name) const
+		GL_Handle get(ASSET::GL_Handle_Type type, const char* name) const
 		{
 			return getVerified(AssetKey(type, name));
 		}
-		//Template get Asset
-		template<ASSET::GL_Handel_Type t>
-		GL_Handel get(const char* name) const
+		//Get Asset: Fancy Templated Edition
+		template<ASSET::GL_Handle_Type t>
+		GL_Handle get(const char* name) const
 		{
 			return getVerified(AssetKey(t, name));
 		}
 		//Asset reference get
-		GL_Handel get(const AssetKey &key) const
+		GL_Handle get(const AssetKey &key) const
 		{
 			return getVerified(key);
 		}
 		//fetch with asset object
-		GL_Handel operator[](const AssetKey &key) const
+		GL_Handle operator[](const AssetKey &key) const
 		{
 			return getVerified(key);
 		}
 
 		const void* getUniform(const AssetKey &key)
 		{
-			return handels.find(key)._Ptr;
+			return handles.find(key)._Ptr;
 		}
 
 
 		bool buildVAO		(const char* name, const struct Vertex *verts, unsigned int vsize, const unsigned int *indices, unsigned int isize);
-		bool buildFBO		(const char* name, unsigned int w, unsigned int h, unsigned int nTextures, const char* names[], const unsigned int depths[]);
+		bool buildFBO		(const char* name, unsigned int w, unsigned int h, unsigned int nTextures, const char* names[], const unsigned int depths[], bool hasDepth);
 		bool buildTexture	(const char* name, unsigned int w, unsigned int h, unsigned int depth, const char* pixels = nullptr);
 		bool loadTexture	(const char* name, const char* path);
 		bool loadShader		(const char* name, const char* vertexpath, const char* fragmentpath);

@@ -81,7 +81,7 @@ struct GPassFrameBuffer
 
 		glGenTextures(1, &specularMap);
 		glBindTexture(GL_TEXTURE_2D, specularMap);
-		glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA32F, width, height);
+		glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA16F, width, height);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
@@ -117,10 +117,17 @@ struct LightFrameBuffer
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lightTexture, 0);
+		glGenTextures(1, &specularTexture);
+		glBindTexture(GL_TEXTURE_2D, specularTexture);
+		glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGB8, width, height);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-		GLenum lightTargets[] = { GL_COLOR_ATTACHMENT0 };
-		glDrawBuffers(1, lightTargets);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lightTexture, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, specularTexture, 0);
+
+		GLenum lightTargets[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+		glDrawBuffers(2, lightTargets);
 		auto status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 		if (status != GL_FRAMEBUFFER_COMPLETE)
 		{

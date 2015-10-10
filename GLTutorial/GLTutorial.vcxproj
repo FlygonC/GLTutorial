@@ -135,6 +135,7 @@
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="AppPlanets.cpp" />
     <ClCompile Include="AppRenderer.cpp" />
+    <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Controller.cpp" />
     <ClCompile Include="FBXLoader.cpp" />
@@ -160,6 +161,7 @@
     <ClInclude Include="Application.h" />
     <ClInclude Include="AppPlanets.h" />
     <ClInclude Include="AppRenderer.h" />
+    <ClInclude Include="AssetLibrary.h" />
     <ClInclude Include="AssetManager.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Controller.h" />
@@ -169,6 +171,8 @@
     <ClInclude Include="ShaderLoader.h" />
     <ClInclude Include="Sky.h" />
     <ClInclude Include="SkyBox.h" />
+    <ClInclude Include="Vertex.h" />
+    <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\dependencies\FBXLoader_d.lib" />

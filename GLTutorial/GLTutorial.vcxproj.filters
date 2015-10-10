@@ -19,6 +19,12 @@
     <Filter Include="Source Files\Includes">
       <UniqueIdentifier>{2fef9a68-3c60-4195-ba2c-d9c7fb027225}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\AssetLibrary">
+      <UniqueIdentifier>{515a7fa6-a8a4-450d-ad42-547fd0e25c4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\AssetLibrarySource">
+      <UniqueIdentifier>{08df22c9-fd49-4709-919b-b66cca3c2e24}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -74,6 +80,9 @@
     </ClCompile>
     <ClCompile Include="AppDeferredStart.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetManager.cpp">
+      <Filter>Source Files\AssetLibrarySource</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -146,8 +155,17 @@
     <ClInclude Include="GLUtilities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AssetLibrary.h">
+      <Filter>Header Files\AssetLibrary</Filter>
+    </ClInclude>
     <ClInclude Include="AssetManager.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\AssetLibrary</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.h">
+      <Filter>Header Files\AssetLibrary</Filter>
+    </ClInclude>
+    <ClInclude Include="Vertex.h">
+      <Filter>Header Files\AssetLibrary</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

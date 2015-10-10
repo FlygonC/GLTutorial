@@ -15,6 +15,7 @@ uniform sampler2D normalTexture;
 uniform sampler2D specularMap;
 
 layout(location = 0) out vec3 lightTexture;
+layout(location = 1) out vec3 specularTexture;
 
 void main() {
 	vec3 normal = normalize( texture(normalTexture, fTexCoord).xyz );
@@ -33,6 +34,6 @@ void main() {
 	is = pow( is, specularPower );
 	
 	//Output
-	lightTexture = (lightDiffuse * (d))
-					+ (lightDiffuse * (specular * is));
+	lightTexture = (lightDiffuse * d);
+	specularTexture = (lightDiffuse * is);
 }
