@@ -84,6 +84,12 @@
     <ClCompile Include="AssetManager.cpp">
       <Filter>Source Files\AssetLibrarySource</Filter>
     </ClCompile>
+    <ClCompile Include="Window.cpp">
+      <Filter>Source Files\AssetLibrarySource</Filter>
+    </ClCompile>
+    <ClCompile Include="Render.cpp">
+      <Filter>Source Files\AssetLibrarySource</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppPlanets.h">
@@ -165,6 +171,12 @@
       <Filter>Header Files\AssetLibrary</Filter>
     </ClInclude>
     <ClInclude Include="Vertex.h">
+      <Filter>Header Files\AssetLibrary</Filter>
+    </ClInclude>
+    <ClInclude Include="Render.h">
+      <Filter>Header Files\AssetLibrary</Filter>
+    </ClInclude>
+    <ClInclude Include="ALApplication.h">
       <Filter>Header Files\AssetLibrary</Filter>
     </ClInclude>
   </ItemGroup>

@@ -101,7 +101,7 @@ bool AssetLibrary::AssetManager::buildFBO(const char* name, unsigned int w, unsi
 	return true;
 }
 
-bool AssetLibrary::AssetManager::buildTexture(const char* name, unsigned int w, unsigned int h, unsigned int depth, const char* pixles = nullptr)
+bool AssetLibrary::AssetManager::buildTexture(const char* name, unsigned int w, unsigned int h, unsigned int depth, const char* pixles)
 {
 	if (get<ASSET::TEXTURE>(name) != 0)
 	{
@@ -137,12 +137,95 @@ bool AssetLibrary::AssetManager::loadTexture(const char* name, const char* path)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imageWidth, imageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	//glBindTexture(GL_TEXTURE_2D, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	stbi_image_free(data);
+
+	return true;
 }
 
 bool AssetLibrary::AssetManager::loadShader(const char* name, const char* vertexpath, const char* fragmentpath)
 {
 	setInternal(ASSET::SHADER, name, ShaderLoader::createShaderProgram(vertexpath, fragmentpath));
+	return true;
+}
+
+bool AssetLibrary::AssetManager::loadFBX(const char* name, const char* path)
+{
+	FBXFile file;
+	file.load(path);
+	//	file.initialiseOpenGLTextures();
+	printf("Load FBX Start:\n");
+
+	for (unsigned int i = 0; i < file.getMeshCount(); i++)
+	{
+		auto m = file.getMeshByIndex(i);
+		//load vertecies
+		std::vector<Vertex> fbxData(m->m_vertices.size());
+		fbxData.data();
+		for (unsigned j = 0; j < m->m_vertices.size(); j++)
+		{
+			fbxData[j].position = m->m_vertices[j].position;
+			fbxData[j].normal = m->m_vertices[j].normal;
+			fbxData[j].tangent = m->m_vertices[j].tangent;
+			fbxData[j].texcoord = m->m_vertices[j].texCoord1;
+		}
+		buildVAO(m->m_name.c_str(), fbxData.data(), m->m_vertices.size(), m->m_indices.data(), m->m_indices.size());
+
+		//Diffuse Map
+		if (m->m_material->textures[FBXMaterial::DiffuseTexture] != NULL)
+		{
+			loadTexture(m->m_material->textures[FBXMaterial::DiffuseTexture]->name.c_str(), m->m_material->textures[FBXMaterial::DiffuseTexture]->path.c_str());
+		}
+		//Normal Map
+		if (m->m_material->textures[FBXMaterial::NormalTexture] != NULL)
+		{
+			loadTexture(m->m_material->textures[FBXMaterial::NormalTexture]->name.c_str(), m->m_material->textures[FBXMaterial::NormalTexture]->path.c_str());
+		}
+		//Specular Map
+		if (m->m_material->textures[FBXMaterial::SpecularTexture] != NULL)
+		{
+			loadTexture(m->m_material->textures[FBXMaterial::SpecularTexture]->name.c_str(), m->m_material->textures[FBXMaterial::SpecularTexture]->path.c_str());
+		}
+	}
+	file.unload();
+	printf("Load FBX End.\n");
+	return true;
+}
+
+bool AssetLibrary::AssetManager::loadOBJ(const char* name, const char* path)
+{
+	return false;
+}
+
+bool AssetLibrary::AssetManager::init()
+{
+	setInternal(ASSET::FBO, "Screen", 0);
+
+	buildVAO("Quad", QuadVerts, 4, QuadIndex, 6);
+	buildVAO("Cube", CubeVerts, 24, CubeIndex, 36);
+
+	float test[] = { 1.f, 1.f, 1.f, 1.f,   1.f, 0.f, 0.f, 1.f,
+					 0.f, 1.f, 0.f, 1.f,   0.f, 0.f, 1.f, 1.f };
+	buildTexture("Test", 2, 2, GL_RGBA8, (char*)test);
+	float white[] = { 1.f, 1.f, 1.f, 1.f };
+	buildTexture("White", 1, 1, GL_RGBA8, (char*)white);
+
+	return true;
+}
+void AssetLibrary::AssetManager::kill()
+{
+	for each(std::pair<AssetKey, GL_Handle> k in handles)
+	{
+		switch (k.first.first)
+		{
+		case ASSET::VBO:		glDeleteBuffers(1, &k.second);			break;
+		case ASSET::IBO:		glDeleteBuffers(1, &k.second);			break;
+		case ASSET::VAO:		glDeleteVertexArrays(1, &k.second);		break;
+		case ASSET::SHADER:		glDeleteShader(k.second);				break;
+		case ASSET::TEXTURE:	glDeleteTextures(1, &k.second);			break;
+		case ASSET::RBO:		glDeleteRenderbuffers(1, &k.second);	break;
+		case ASSET::FBO:		glDeleteFramebuffers(1, &k.second);		break;
+		}
+	}
 }

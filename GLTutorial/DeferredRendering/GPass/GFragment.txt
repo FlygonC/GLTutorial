@@ -39,5 +39,5 @@ void main() {
 	//Specular
 	gpassSpecular.xyz = texture(specularMap, vTexCoord).xyz;
 //	gpassSpecular.xyz = vec3(1, 1, 1);
-	gpassSpecular.a = 32 / 4;
+	gpassSpecular.a = 8;
 }

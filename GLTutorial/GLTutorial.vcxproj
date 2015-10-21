@@ -141,9 +141,11 @@
     <ClCompile Include="FBXLoader.cpp" />
     <ClCompile Include="FlyCamera.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Render.cpp" />
     <ClCompile Include="ShaderLoader.cpp" />
     <ClCompile Include="Sky.cpp" />
     <ClCompile Include="SkyBox.cpp" />
+    <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\includes\aie\Gizmos.h" />
@@ -154,6 +156,7 @@
     <ClInclude Include="..\includes\gl_core_4_4.h" />
     <ClInclude Include="..\includes\stb_image.h" />
     <ClInclude Include="..\includes\tiny_obj_loader.h" />
+    <ClInclude Include="ALApplication.h" />
     <ClInclude Include="AppDeferredStart.h" />
     <ClInclude Include="AppPostProcess.h" />
     <ClInclude Include="AppRenderTarget.h" />
@@ -168,6 +171,7 @@
     <ClInclude Include="FBXLoader.h" />
     <ClInclude Include="FlyCamera.h" />
     <ClInclude Include="GLUtilities.h" />
+    <ClInclude Include="Render.h" />
     <ClInclude Include="ShaderLoader.h" />
     <ClInclude Include="Sky.h" />
     <ClInclude Include="SkyBox.h" />

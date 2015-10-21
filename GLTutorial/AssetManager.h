@@ -17,6 +17,20 @@ namespace AssetLibrary
 	typedef std::pair<ASSET::GL_Handle_Type, std::string> AssetKey;
 	typedef unsigned int GL_Handle;
 
+	template<ASSET::GL_Handle_Type T>
+	struct Asset
+	{
+		const ASSET::GL_Handle_Type type;
+		std::string name;
+		Asset() : type(T), name("") {}
+		Asset(std::string name) : type(T), name(name) {}
+		Asset &operator=(const char* s) { name = s; return *this; }
+		operator AssetKey() const { return AssetKey(type, name); }
+		GL_Handle operator*() const { return AssetManager::instance()[*this]; }
+		const void* operator&() const { return AssetManager::instance().getUNIFORM(*this); }
+		operator const void*() const { return AssetManager::instance().getUNIFORM(*this); }
+	};
+
 	class AssetManager
 	{
 		struct Hash
@@ -58,7 +72,7 @@ namespace AssetLibrary
 		{
 			return getVerified(key);
 		}
-		//fetch with asset object
+		//fetch with key object
 		GL_Handle operator[](const AssetKey &key) const
 		{
 			return getVerified(key);
@@ -66,7 +80,7 @@ namespace AssetLibrary
 
 		const void* getUniform(const AssetKey &key)
 		{
-			return handles.find(key)._Ptr;
+			return &handles.find(key)._Ptr->_Myval.second;
 		}
 
 

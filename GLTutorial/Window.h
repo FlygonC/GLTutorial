@@ -14,7 +14,7 @@ namespace AssetLibrary
 	public:
 		static Window &instance() { static Window a; return a; }
 
-		bool build(unsigned int w, unsigned int h);
+		bool build(unsigned int w, unsigned int h, const char* title);
 
 		void step();
 
