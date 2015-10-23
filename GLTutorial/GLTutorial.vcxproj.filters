@@ -25,12 +25,21 @@
     <Filter Include="Source Files\AssetLibrarySource">
       <UniqueIdentifier>{08df22c9-fd49-4709-919b-b66cca3c2e24}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\AssetLibrarySource\DeferredRenderSource">
+      <UniqueIdentifier>{3a3d086c-74d0-4578-b5e6-59e221b26c03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\AssetLibrary\Deferred Renderer">
+      <UniqueIdentifier>{b061d19a-ac60-41f0-8232-c7271f4719c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Apps">
+      <UniqueIdentifier>{9d143287-3c2a-4731-a1aa-24efa804baa5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Apps Source">
+      <UniqueIdentifier>{a3dce142-486a-4fd1-9269-25cff445082d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AppPlanets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
@@ -40,12 +49,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Controller.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AppRenderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AppFBX.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\includes\gl_core_4_4.c">
@@ -63,22 +66,10 @@
     <ClCompile Include="ShaderLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Application.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AppRenderTarget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AppPostProcess.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Sky.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SkyBox.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AppDeferredStart.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AssetManager.cpp">
@@ -90,11 +81,35 @@
     <ClCompile Include="Render.cpp">
       <Filter>Source Files\AssetLibrarySource</Filter>
     </ClCompile>
+    <ClCompile Include="GPass.cpp">
+      <Filter>Source Files\AssetLibrarySource\DeferredRenderSource</Filter>
+    </ClCompile>
+    <ClCompile Include="TestApplication.cpp">
+      <Filter>Source Files\AssetLibrarySource</Filter>
+    </ClCompile>
+    <ClCompile Include="AppDeferredStart.cpp">
+      <Filter>Source Files\Apps Source</Filter>
+    </ClCompile>
+    <ClCompile Include="AppFBX.cpp">
+      <Filter>Source Files\Apps Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Application.cpp">
+      <Filter>Source Files\Apps Source</Filter>
+    </ClCompile>
+    <ClCompile Include="AppPlanets.cpp">
+      <Filter>Source Files\Apps Source</Filter>
+    </ClCompile>
+    <ClCompile Include="AppPostProcess.cpp">
+      <Filter>Source Files\Apps Source</Filter>
+    </ClCompile>
+    <ClCompile Include="AppRenderer.cpp">
+      <Filter>Source Files\Apps Source</Filter>
+    </ClCompile>
+    <ClCompile Include="AppRenderTarget.cpp">
+      <Filter>Source Files\Apps Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AppPlanets.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -102,12 +117,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Controller.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AppRenderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AppFBX.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\includes\FBXFile.h">
@@ -140,22 +149,10 @@
     <ClInclude Include="ShaderLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Application.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AppRenderTarget.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AppPostProcess.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Sky.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SkyBox.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AppDeferredStart.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GLUtilities.h">
@@ -177,6 +174,39 @@
       <Filter>Header Files\AssetLibrary</Filter>
     </ClInclude>
     <ClInclude Include="ALApplication.h">
+      <Filter>Header Files\AssetLibrary</Filter>
+    </ClInclude>
+    <ClInclude Include="GPass.h">
+      <Filter>Header Files\AssetLibrary\Deferred Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="TestApplication.h">
+      <Filter>Header Files\AssetLibrary</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderEngine.h">
+      <Filter>Header Files\AssetLibrary\Deferred Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="AppRenderTarget.h">
+      <Filter>Header Files\Apps</Filter>
+    </ClInclude>
+    <ClInclude Include="AppDeferredStart.h">
+      <Filter>Header Files\Apps</Filter>
+    </ClInclude>
+    <ClInclude Include="AppFBX.h">
+      <Filter>Header Files\Apps</Filter>
+    </ClInclude>
+    <ClInclude Include="Application.h">
+      <Filter>Header Files\Apps</Filter>
+    </ClInclude>
+    <ClInclude Include="AppPlanets.h">
+      <Filter>Header Files\Apps</Filter>
+    </ClInclude>
+    <ClInclude Include="AppPostProcess.h">
+      <Filter>Header Files\Apps</Filter>
+    </ClInclude>
+    <ClInclude Include="AppRenderer.h">
+      <Filter>Header Files\Apps</Filter>
+    </ClInclude>
+    <ClInclude Include="ForwardPass.h">
       <Filter>Header Files\AssetLibrary</Filter>
     </ClInclude>
   </ItemGroup>

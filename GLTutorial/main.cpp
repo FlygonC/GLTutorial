@@ -1,13 +1,15 @@
 //#include "AppPlanets.h"
 //#include "AppRenderer.h"
 //#include "AppFBX.h"
-#include "AppRenderTarget.h"
-#include "AppPostProcess.h"
-#include "AppDeferredStart.h"
+//#include "AppRenderTarget.h"
+//#include "AppPostProcess.h"
+//#include "AppDeferredStart.h"
+
+#include "AssetLibrary.h"
 
 int main()
 {
-	Application *App = new AppDeferredStart();
+/*	Application *App = new AppDeferredStart();
 	if (App->init(1280, 720, "Application"))
 	{
 		while (App->step())
@@ -21,6 +23,15 @@ int main()
 	}
 	App->kill();
 	delete App;
-	
+	*/
+
+	using namespace AssetLibrary;
+
+	Application* App = new Application();
+	App->init();
+	App->play();
+	App->kill();
+	delete App;
+
 	return 0;
 }

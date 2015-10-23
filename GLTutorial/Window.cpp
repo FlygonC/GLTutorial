@@ -1,3 +1,4 @@
+#include <gl_core_4_4.h>
 #include "Window.h"
 
 bool AssetLibrary::Window::build(unsigned int w, unsigned int h, const char* title)
@@ -17,6 +18,8 @@ bool AssetLibrary::Window::build(unsigned int w, unsigned int h, const char* tit
 	}
 
 	glfwMakeContextCurrent(window);
+
+	ogl_LoadFunctions();
 
 	return true;
 }

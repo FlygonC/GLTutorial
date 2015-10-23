@@ -1,28 +1,40 @@
+#include <gl_core_4_4.h>
 #include "AssetLibrary.h"
+
+using namespace AssetLibrary::ASSET;
+const char* AssetLibrary::TYPE_NAMES[eSIZE + 1] = { "NONE","VAO","IBO","VBO","SIZE","FBO","RBO","Texture","Shader","SIZE" };
 
 AssetLibrary::GL_Handle AssetLibrary::AssetManager::getVerified(const AssetKey &key) const
 {
-	//Possible debug stuff here
-	return handles.at(key);
+	if (handles.at(key))
+	{
+		return handles.at(key);
+	}
+	else
+	{
+		return NULL;
+	}
 }
 bool AssetLibrary::AssetManager::setInternal(ASSET::GL_Handle_Type t, const char* name, GL_Handle handle)
 {
 	AssetKey key(t, name);
 	if (handles.count(key))
 	{
+		std::cout << "Asset " << name << "<" << TYPE_NAMES[t] << "> already exists." << std::endl;
 		return false;
 	}
 	handles[key] = handle;
+	std::cout << "Asset " << name << "<" << TYPE_NAMES[t] << "> created!" << std::endl;
 	return true;
 }
 
 bool AssetLibrary::AssetManager::buildVAO(const char* name, const struct Vertex *verts, unsigned int vsize, const unsigned int *indices, unsigned int isize)
 {
 	//check for copy
-	if (get<ASSET::VAO>(name) != 0)
+/*	if (get<ASSET::VAO>(name) != 0)
 	{
 		return false;
-	}
+	}*/
 
 	GL_Handle vaoHandle;
 	GL_Handle vboHandle;
@@ -36,6 +48,7 @@ bool AssetLibrary::AssetManager::buildVAO(const char* name, const struct Vertex 
 	setInternal(ASSET::VAO, name, vaoHandle);
 	setInternal(ASSET::VBO, name, vboHandle);
 	setInternal(ASSET::IBO, name, iboHandle);
+	setInternal(ASSET::SIZE, name, isize);
 
 	//Set Data
 	glBindVertexArray(vaoHandle);
@@ -65,10 +78,10 @@ bool AssetLibrary::AssetManager::buildVAO(const char* name, const struct Vertex 
 
 bool AssetLibrary::AssetManager::buildFBO(const char* name, unsigned int w, unsigned int h, unsigned int nTextures, const char* names[], const unsigned int depths[], bool hasDepth)
 {
-	if (get<ASSET::FBO>(name) != 0)
+	/*if (get<ASSET::FBO>(name) != 0)
 	{
 		return false;
-	}
+	}*/
 	GL_Handle fboHandle;
 	glGenFramebuffers(1, &fboHandle);
 	setInternal(ASSET::FBO, name, fboHandle);
@@ -101,12 +114,12 @@ bool AssetLibrary::AssetManager::buildFBO(const char* name, unsigned int w, unsi
 	return true;
 }
 
-bool AssetLibrary::AssetManager::buildTexture(const char* name, unsigned int w, unsigned int h, unsigned int depth, const char* pixles)
+bool AssetLibrary::AssetManager::buildTexture(const char* name, unsigned int w, unsigned int h, unsigned int depth, const unsigned char* pixles)
 {
-	if (get<ASSET::TEXTURE>(name) != 0)
+	/*if (get<ASSET::TEXTURE>(name) != 0)
 	{
 		return false;
-	}
+	}*/
 	GL_Handle texHandle;
 	glGenTextures(1, &texHandle);
 	setInternal(ASSET::TEXTURE, name, texHandle);
@@ -207,9 +220,11 @@ bool AssetLibrary::AssetManager::init()
 
 	float test[] = { 1.f, 1.f, 1.f, 1.f,   1.f, 0.f, 0.f, 1.f,
 					 0.f, 1.f, 0.f, 1.f,   0.f, 0.f, 1.f, 1.f };
-	buildTexture("Test", 2, 2, GL_RGBA8, (char*)test);
+	buildTexture("Test", 2, 2, GL_RGBA8, (unsigned char*)test);
 	float white[] = { 1.f, 1.f, 1.f, 1.f };
-	buildTexture("White", 1, 1, GL_RGBA8, (char*)white);
+	buildTexture("White", 1, 1, GL_RGBA8, (unsigned char*)white);
+
+	loadShader("./VertexShader.txt", "./FragmentShader.txt");
 
 	return true;
 }

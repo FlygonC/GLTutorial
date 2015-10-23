@@ -6,12 +6,12 @@ namespace AssetLibrary
 {
 	class Application
 	{
-	public:
-		virtual bool onInit() { return false; };
+	protected:
+		virtual void onInit() {};
 		virtual void onKill() {};
 		virtual void onPlay() {};
 		virtual void onStep() {};
-
+	public:
 		void init(int width = 1280, int height = 720, const char* name = "Application")
 		{
 			Window::instance().build(width, height, name);

@@ -13,6 +13,7 @@ namespace AssetLibrary
 	{
 		enum GL_Handle_Type { NONE = 0, VAO, VBO, IBO, SIZE, FBO, RBO, TEXTURE, SHADER, eSIZE };
 	}
+	extern const char *TYPE_NAMES[];
 
 	typedef std::pair<ASSET::GL_Handle_Type, std::string> AssetKey;
 	typedef unsigned int GL_Handle;
@@ -67,7 +68,7 @@ namespace AssetLibrary
 		{
 			return getVerified(AssetKey(t, name));
 		}
-		//Asset reference get
+		//Get Asset by key
 		GL_Handle get(const AssetKey &key) const
 		{
 			return getVerified(key);
@@ -86,7 +87,7 @@ namespace AssetLibrary
 
 		bool buildVAO		(const char* name, const struct Vertex *verts, unsigned int vsize, const unsigned int *indices, unsigned int isize);
 		bool buildFBO		(const char* name, unsigned int w, unsigned int h, unsigned int nTextures, const char* names[], const unsigned int depths[], bool hasDepth);
-		bool buildTexture	(const char* name, unsigned int w, unsigned int h, unsigned int depth, const char* pixels = nullptr);
+		bool buildTexture	(const char* name, unsigned int w, unsigned int h, unsigned int depth, const unsigned char* pixels = nullptr);
 		bool loadTexture	(const char* name, const char* path);
 		bool loadShader		(const char* name, const char* vertexpath, const char* fragmentpath);
 		bool loadFBX		(const char* name, const char* path);

@@ -8,3 +8,4 @@
 #include "AssetManager.h"
 #include "Window.h"
 #include "Vertex.h"
+#include "ALApplication.h"
