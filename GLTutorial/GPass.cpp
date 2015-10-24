@@ -1,6 +1,6 @@
 #include "GPass.h"
 
-void DeferredEngine::GPass::init()
+void RenderEngine::GPass::init()
 {
 	auto &a = AssetLibrary::AssetManager::instance();
 	auto &w = AssetLibrary::Window::instance();
@@ -9,15 +9,15 @@ void DeferredEngine::GPass::init()
 	const unsigned gpassdepths[] = { GL_RGB8, GL_RGB32F, GL_RGB32F, GL_RGBA32F };
 	a.buildFBO("GPassFrameBuffer", w.getWidth(), w.getHeight(), 4, gpasstexturenames, gpassdepths, true);
 
-	fbo = "GpassFrameBuffer";
+	fbo = "GPassFrameBuffer";
 }
 
-void DeferredEngine::GPass::prep()
+void RenderEngine::GPass::prep()
 {
 
 }
 
-void DeferredEngine::GPass::post()
+void RenderEngine::GPass::post()
 {
 
 }

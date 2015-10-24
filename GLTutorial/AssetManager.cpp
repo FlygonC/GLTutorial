@@ -224,7 +224,7 @@ bool AssetLibrary::AssetManager::init()
 	float white[] = { 1.f, 1.f, 1.f, 1.f };
 	buildTexture("White", 1, 1, GL_RGBA8, (unsigned char*)white);
 
-	loadShader("./VertexShader.txt", "./FragmentShader.txt");
+	//loadShader("ForwardShader", "./VertexShader.txt", "./FragmentShader.txt");
 
 	return true;
 }

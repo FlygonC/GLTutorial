@@ -108,6 +108,9 @@
     <ClCompile Include="AppRenderTarget.cpp">
       <Filter>Source Files\Apps Source</Filter>
     </ClCompile>
+    <ClCompile Include="RenderEngine.cpp">
+      <Filter>Source Files\AssetLibrarySource\DeferredRenderSource</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">

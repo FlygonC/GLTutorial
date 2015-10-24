@@ -17,11 +17,12 @@ namespace AssetLibrary
 		Asset<ASSET::FBO> fbo;
 		Asset<ASSET::SHADER> shader;
 	public:
+		RenderPass() {}
 		RenderPass(Asset<ASSET::SHADER> a_shader, Asset<ASSET::FBO> a_fbo) : shader(a_shader), fbo(a_fbo) {}
 
 		bool setUniform(const char* name, UNIFORM::TYPE type, const void* value, unsigned count = 1, bool normalize = false);
 
-		virtual void prep() = 0;
-		virtual void post() = 0;
+		virtual void prep() {};
+		virtual void post() {};
 	};
 }

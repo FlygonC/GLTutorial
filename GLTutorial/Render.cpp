@@ -12,7 +12,7 @@ bool AssetLibrary::RenderPass::setUniform(const char * name, UNIFORM::TYPE type,
 	case UNIFORM::MAT4: glUniformMatrix4fv(loc, count, normalize, (GLfloat*)value); break;
 	case UNIFORM::INT1: glUniform1i(loc, (GLint)value); break;
 	case UNIFORM::TEX2: glActiveTexture(GL_TEXTURE0 + count);
-						glBindTexture(GL_TEXTURE, *(const GLuint*)value);
+						glBindTexture(GL_TEXTURE_2D, *(const GLuint*)value);
 						glUniform1i(loc, count);
 						break;
 	default: return false;
