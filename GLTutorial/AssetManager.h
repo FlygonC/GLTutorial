@@ -26,6 +26,7 @@ namespace AssetLibrary
 		Asset() : type(T), name("") {}
 		Asset(std::string name) : type(T), name(name) {}
 		Asset &operator=(const char* s) { name = s; return *this; }
+		void operator=(Asset other) { name = other.name; }
 		operator AssetKey() const { return AssetKey(type, name); }
 		GL_Handle operator*() const { return AssetManager::instance()[*this]; }
 		const void* operator&() const { return AssetManager::instance().getUNIFORM(*this); }
@@ -79,7 +80,7 @@ namespace AssetLibrary
 			return getVerified(key);
 		}
 
-		const void* getUniform(const AssetKey &key)
+		const void* getUNIFORM(const AssetKey &key)
 		{
 			return &handles.find(key)._Ptr->_Myval.second;
 		}

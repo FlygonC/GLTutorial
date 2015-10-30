@@ -16,16 +16,18 @@ out vec2 vTexCoord;
 uniform mat4 View; // needed in addition to Projection * View
 uniform mat4 ProjectionView;
 
+uniform mat4 Model;
+
 
 void main() {
 	// first store view-space position and normal
-	vPosition = View * Position;
+	vPosition = View * Model * Position;
 	
-	vNormal = Normal;
+	vNormal = Model * Normal;
 	vTangent = Tangent;
 	vBiTangent = cross(vTangent.xyz,vNormal.xyz);
 	
 	vTexCoord = TexCoord;
 	
-	gl_Position = ProjectionView * Position;
+	gl_Position = ProjectionView * Model * Position;
 }

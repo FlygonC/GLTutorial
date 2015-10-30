@@ -2,9 +2,12 @@
 
 #include <list>
 
-#include "AssetLibrary.h"
+#include "AssetManager.h"
+#include "Window.h"
 
-namespace AssetLibrary
+using namespace AssetLibrary;
+
+namespace RenderEngine
 {
 	namespace UNIFORM
 	{
@@ -13,12 +16,11 @@ namespace AssetLibrary
 
 	class RenderPass
 	{
-	protected:
+	public:
 		Asset<ASSET::FBO> fbo;
 		Asset<ASSET::SHADER> shader;
-	public:
+	
 		RenderPass() {}
-		RenderPass(Asset<ASSET::SHADER> a_shader, Asset<ASSET::FBO> a_fbo) : shader(a_shader), fbo(a_fbo) {}
 
 		bool setUniform(const char* name, UNIFORM::TYPE type, const void* value, unsigned count = 1, bool normalize = false);
 

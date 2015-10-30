@@ -1,6 +1,8 @@
 #pragma once
 
-#include "AssetLibrary.h"
+#include "AssetManager.h"
+#include "Window.h"
+#include "RenderEngine.h"
 
 namespace AssetLibrary
 {
@@ -10,12 +12,14 @@ namespace AssetLibrary
 		virtual void onInit() {};
 		virtual void onKill() {};
 		virtual void onPlay() {};
-		virtual void onStep() {};
+		virtual void onStep(float dTime) {};
 	public:
+		float currentTime, deltaTime, lastTime;
 		void init(int width = 1280, int height = 720, const char* name = "Application")
 		{
 			Window::instance().build(width, height, name);
 			AssetManager::instance().init();
+			RenderEngine::Renderer::instance().init();
 			onInit();
 		}
 
@@ -24,18 +28,26 @@ namespace AssetLibrary
 			onKill();
 			AssetManager::instance().kill();
 			Window::instance().kill();
+			RenderEngine::Renderer::instance().kill();
 		}
 
 		void play()
 		{
 			onPlay();
-			do { step(); } while (Window::instance().getShouldClose() == false);
+			do { 
+				step();
+				RenderEngine::Renderer::instance().render();
+			} 
+			while (Window::instance().getShouldClose() == false);
 		}
 
 		void step()
 		{
 			Window::instance().step();
-			onStep();
+			currentTime = glfwGetTime();
+			deltaTime = currentTime - lastTime;
+			lastTime = currentTime;
+			onStep(deltaTime);
 		}
 	};
 }

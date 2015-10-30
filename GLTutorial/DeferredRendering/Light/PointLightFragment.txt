@@ -7,6 +7,7 @@ uniform vec3 lightPositionView;
 uniform vec3 lightDiffuse;
 uniform float lightRadius;
 
+uniform mat4 cameraView;
 uniform vec3 cameraPosition;
 
 uniform sampler2D positionTexture;
@@ -25,6 +26,8 @@ void main() {
 	
 	vec3 toLight = lightPositionView - position;
 	
+	
+	//vec4 viewDirection = cameraView * vec4(toLight, 0);
 	float d = max(0, dot(normal, normalize(toLight)));
 	
 	// simple linear falloff

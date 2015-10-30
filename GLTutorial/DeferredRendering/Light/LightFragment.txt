@@ -2,12 +2,13 @@
 
 in vec2 fTexCoord;
 
-out vec3 LightOutput;
+//out vec3 LightOutput;
 
 // direction in view-space
 uniform vec3 lightDirection;
 uniform vec3 lightDiffuse;
 
+uniform mat4 cameraView;
 uniform vec3 cameraPosition;
 
 uniform sampler2D positionTexture;
@@ -21,7 +22,9 @@ void main() {
 	vec3 normal = normalize( texture(normalTexture, fTexCoord).xyz );
 	vec3 position = texture(positionTexture, fTexCoord).xyz;
 	
-	float d = max(0, dot(normal, normalize(lightDirection)));
+	
+	vec4 viewDirection = cameraView * vec4(lightDirection, 0);
+	float d = max(0, dot(normal, normalize(viewDirection.xyz)));
 	
 	//Specular Calculation
 	vec3 specular = texture(specularMap, fTexCoord).xyz;

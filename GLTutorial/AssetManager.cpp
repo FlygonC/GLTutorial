@@ -20,11 +20,11 @@ bool AssetLibrary::AssetManager::setInternal(ASSET::GL_Handle_Type t, const char
 	AssetKey key(t, name);
 	if (handles.count(key))
 	{
-		std::cout << "Asset " << name << "<" << TYPE_NAMES[t] << "> already exists." << std::endl;
+		std::cout << "Asset " << "<" << TYPE_NAMES[t] << ">" << name << " already exists." << std::endl;
 		return false;
 	}
 	handles[key] = handle;
-	std::cout << "Asset " << name << "<" << TYPE_NAMES[t] << "> created!" << std::endl;
+	std::cout << "Asset " << "<" << TYPE_NAMES[t] << ">" << name << " created!" << std::endl;
 	return true;
 }
 
@@ -67,7 +67,7 @@ bool AssetLibrary::AssetManager::buildVAO(const char* name, const struct Vertex 
 	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec4) * 3));
 	//index
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboHandle);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * vsize, indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * isize, indices, GL_STATIC_DRAW);
 	//unbind
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -114,7 +114,7 @@ bool AssetLibrary::AssetManager::buildFBO(const char* name, unsigned int w, unsi
 	return true;
 }
 
-bool AssetLibrary::AssetManager::buildTexture(const char* name, unsigned int w, unsigned int h, unsigned int depth, const unsigned char* pixles)
+bool AssetLibrary::AssetManager::buildTexture(const char* name, unsigned int w, unsigned int h, unsigned int depth, const unsigned char* pixels)
 {
 	/*if (get<ASSET::TEXTURE>(name) != 0)
 	{
@@ -126,7 +126,14 @@ bool AssetLibrary::AssetManager::buildTexture(const char* name, unsigned int w, 
 
 	glBindTexture(GL_TEXTURE_2D, texHandle);
 
-	glTexStorage2D(GL_TEXTURE_2D, 1, depth, w, h);
+	if (pixels != nullptr)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, depth, w, h, 0, depth, GL_UNSIGNED_BYTE, pixels);
+	}
+	else
+	{
+		glTexStorage2D(GL_TEXTURE_2D, 1, depth, w, h);
+	}
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
@@ -138,19 +145,29 @@ bool AssetLibrary::AssetManager::buildTexture(const char* name, unsigned int w, 
 bool AssetLibrary::AssetManager::loadTexture(const char* name, const char* path)
 {
 	int imageWidth, imageHeight, imageFormat = 0;
+	unsigned int format;
 	unsigned char* data;
 
 	data = stbi_load(path, &imageWidth, &imageHeight, &imageFormat, STBI_default);
 
-	GL_Handle texHandle;
+	switch (imageFormat)
+	{
+	case 1: format = GL_RED; break;
+	case 2: format = GL_RG; break;
+	case 3: format = GL_RGB; break;
+	case 4: format = GL_RGBA; break;
+	}
+
+/*	GL_Handle texHandle;
 	glGenTextures(1, &texHandle);
 	setInternal(ASSET::TEXTURE, name, texHandle);
-
-	glBindTexture(GL_TEXTURE_2D, texHandle);
+	*/
+	buildTexture(name, imageWidth, imageHeight, format, data);
+/*	glBindTexture(GL_TEXTURE_2D, texHandle);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imageWidth, imageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);*/
 
 	stbi_image_free(data);
 
@@ -218,11 +235,17 @@ bool AssetLibrary::AssetManager::init()
 	buildVAO("Quad", QuadVerts, 4, QuadIndex, 6);
 	buildVAO("Cube", CubeVerts, 24, CubeIndex, 36);
 
-	float test[] = { 1.f, 1.f, 1.f, 1.f,   1.f, 0.f, 0.f, 1.f,
-					 0.f, 1.f, 0.f, 1.f,   0.f, 0.f, 1.f, 1.f };
-	buildTexture("Test", 2, 2, GL_RGBA8, (unsigned char*)test);
-	float white[] = { 1.f, 1.f, 1.f, 1.f };
-	buildTexture("White", 1, 1, GL_RGBA8, (unsigned char*)white);
+	unsigned char test[] = { 255, 255, 255, 255,   255, 255, 0, 255,
+							 0, 255, 0, 255,   0, 0, 255, 255 };
+
+	//unsigned char t2[] = {255,255,0,255};
+	buildTexture("Test", 2, 2, GL_RGBA, test);
+	unsigned char white[] = { 255, 255, 255, 255 };
+	buildTexture("White", 1, 1, GL_RGBA, white);
+	unsigned char flat[] = { 127, 127, 255, 255 };
+	buildTexture("Flat", 1, 1, GL_RGBA, flat);
+
+	loadTexture("LoadTest", "../resources/skyimagetest.png");
 
 	//loadShader("ForwardShader", "./VertexShader.txt", "./FragmentShader.txt");
 

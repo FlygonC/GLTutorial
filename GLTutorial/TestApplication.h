@@ -8,7 +8,14 @@ class TestApplication : public AssetLibrary::Application
 	void onInit();
 	void onKill();
 	void onPlay();
-	void onStep();
+	void onStep(float dTime);
 
 	FlyCamera camera;
+
+	RenderEngine::RenderObjectEx cube;
+	RenderEngine::DirectionalLightEx dLight;
+	RenderEngine::PointLightEx pLight;
+	RenderEngine::PointLightEx pLight2;
+	RenderEngine::PointLightEx pLight3;
+	RenderEngine::PointLightEx pLight4;
 };

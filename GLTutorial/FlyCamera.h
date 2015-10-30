@@ -5,8 +5,11 @@
 class FlyCamera : public Camera
 {
 public:
-	float speed, rotationX, rotationY, sensitivity = 0;
-	vec3 up, worldPosition = vec3(0);
+	float speed, sensitivity = 0;
+	float rotationX = -45;
+	float rotationY = 45;
+	vec3 up;
+	vec3 worldPosition = vec3(3,4,3);
 	Controller control;
 
 	void update(float dt);

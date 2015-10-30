@@ -5,7 +5,8 @@
 //#include "AppPostProcess.h"
 //#include "AppDeferredStart.h"
 
-#include "AssetLibrary.h"
+//#include "AssetLibrary.h"
+#include "TestApplication.h"
 
 int main()
 {
@@ -27,7 +28,7 @@ int main()
 
 	using namespace AssetLibrary;
 
-	Application* App = new Application();
+	Application* App = new TestApplication();
 	App->init();
 	App->play();
 	App->kill();

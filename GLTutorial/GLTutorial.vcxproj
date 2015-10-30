@@ -140,7 +140,6 @@
     <ClCompile Include="Controller.cpp" />
     <ClCompile Include="FBXLoader.cpp" />
     <ClCompile Include="FlyCamera.cpp" />
-    <ClCompile Include="GPass.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Render.cpp" />
     <ClCompile Include="RenderEngine.cpp" />
@@ -173,9 +172,7 @@
     <ClInclude Include="Controller.h" />
     <ClInclude Include="FBXLoader.h" />
     <ClInclude Include="FlyCamera.h" />
-    <ClInclude Include="ForwardPass.h" />
     <ClInclude Include="GLUtilities.h" />
-    <ClInclude Include="GPass.h" />
     <ClInclude Include="Render.h" />
     <ClInclude Include="RenderEngine.h" />
     <ClInclude Include="ShaderLoader.h" />

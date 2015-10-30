@@ -9,6 +9,7 @@ uniform sampler2D lightTexture;
 uniform sampler2D specularTexture;
 uniform sampler2D specularity;
 
+
 void main() {
 	vec3 albedo = texture(albedoTexture, fTexCoord).rgb;
 	vec3 lightK = texture(lightTexture, fTexCoord).rgb;
@@ -17,4 +18,8 @@ void main() {
 	vec3 lightS = texture(specularity, fTexCoord).rgb;
 	
 	FragColour = vec4((albedo * lightK) + (specular * lightS), 1);
+//	FragColour = vec4( (albedo * lightK), 1);
+
+//	FragColour = texture(albedoTexture,fTexCoord);
+
 }

@@ -78,12 +78,6 @@
     <ClCompile Include="Window.cpp">
       <Filter>Source Files\AssetLibrarySource</Filter>
     </ClCompile>
-    <ClCompile Include="Render.cpp">
-      <Filter>Source Files\AssetLibrarySource</Filter>
-    </ClCompile>
-    <ClCompile Include="GPass.cpp">
-      <Filter>Source Files\AssetLibrarySource\DeferredRenderSource</Filter>
-    </ClCompile>
     <ClCompile Include="TestApplication.cpp">
       <Filter>Source Files\AssetLibrarySource</Filter>
     </ClCompile>
@@ -109,6 +103,9 @@
       <Filter>Source Files\Apps Source</Filter>
     </ClCompile>
     <ClCompile Include="RenderEngine.cpp">
+      <Filter>Source Files\AssetLibrarySource\DeferredRenderSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Render.cpp">
       <Filter>Source Files\AssetLibrarySource\DeferredRenderSource</Filter>
     </ClCompile>
   </ItemGroup>
@@ -173,14 +170,8 @@
     <ClInclude Include="Vertex.h">
       <Filter>Header Files\AssetLibrary</Filter>
     </ClInclude>
-    <ClInclude Include="Render.h">
-      <Filter>Header Files\AssetLibrary</Filter>
-    </ClInclude>
     <ClInclude Include="ALApplication.h">
       <Filter>Header Files\AssetLibrary</Filter>
-    </ClInclude>
-    <ClInclude Include="GPass.h">
-      <Filter>Header Files\AssetLibrary\Deferred Renderer</Filter>
     </ClInclude>
     <ClInclude Include="TestApplication.h">
       <Filter>Header Files\AssetLibrary</Filter>
@@ -209,8 +200,8 @@
     <ClInclude Include="AppRenderer.h">
       <Filter>Header Files\Apps</Filter>
     </ClInclude>
-    <ClInclude Include="ForwardPass.h">
-      <Filter>Header Files\AssetLibrary</Filter>
+    <ClInclude Include="Render.h">
+      <Filter>Header Files\AssetLibrary\Deferred Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
