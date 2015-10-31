@@ -15,6 +15,8 @@ layout(location = 3) out vec4 gpassSpecular;
 
 uniform mat4 View;
 
+uniform float specPower;
+
 uniform sampler2D diffuseMap;
 uniform sampler2D normalMap;
 uniform sampler2D specularMap;
@@ -36,5 +38,5 @@ void main() {
 
 	//Specular
 	gpassSpecular.xyz = texture(specularMap, vTexCoord).xyz;
-	gpassSpecular.a = 8;
+	gpassSpecular.a = specPower;
 }

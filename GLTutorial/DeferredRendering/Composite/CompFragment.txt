@@ -18,8 +18,7 @@ void main() {
 	vec3 lightS = texture(specularity, fTexCoord).rgb;
 	
 	FragColour = vec4((albedo * lightK) + (specular * lightS), 1);
-//	FragColour = vec4( (albedo * lightK), 1);
 
-//	FragColour = texture(albedoTexture,fTexCoord);
+//	FragColour = vec4( (specular * lightS), 1);
 
 }

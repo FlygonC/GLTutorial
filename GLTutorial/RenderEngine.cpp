@@ -290,6 +290,8 @@ void RenderEngine::Renderer::GPassRender::draw(RenderObjectIn ob, Camera c)
 
 	setUniform("Model", UNIFORM::MAT4, glm::value_ptr(ob.transform.get()));
 
+	setUniform("specPower", UNIFORM::FLO1, &ob.material.specularPower);
+
 	setUniform("diffuseMap", UNIFORM::TEX2, ob.material.diffuseTexture, 0);
 	setUniform("normalMap", UNIFORM::TEX2, ob.material.normalTexture, 1);
 	setUniform("specularMap", UNIFORM::TEX2, ob.material.specularTexture, 2);

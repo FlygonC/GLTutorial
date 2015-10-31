@@ -18,9 +18,9 @@ namespace RenderEngine
 		glm::mat4 get()
 		{
 			glm::mat4 r = glm::mat4(1);
-			r *= glm::scale(scale) * 
-				( glm::rotate(rotation.x, glm::vec3(1,0,0)) * glm::rotate(rotation.y, glm::vec3(0, 1, 0)) * glm::rotate(rotation.z, glm::vec3(0, 0, 1)) ) *
-				glm::translate(position);
+			r *= glm::translate(position) *
+				(glm::rotate(rotation.x, glm::vec3(1, 0, 0)) * glm::rotate(rotation.y, glm::vec3(0, 1, 0)) * glm::rotate(rotation.z, glm::vec3(0, 0, 1))) *
+				glm::scale(scale);
 			return r;
 		}
 	};
@@ -40,6 +40,8 @@ namespace RenderEngine
 			this->diffuseTint = other.diffuseTint;
 			this->specularTint = other.specularTint;
 			this->diffuseTint = other.diffuseTint;
+
+			this->specularPower = other.specularPower;
 
 			this->diffuseTexture = other.diffuseTexture;
 			this->normalTexture = other.normalTexture;
@@ -69,7 +71,7 @@ namespace RenderEngine
 	private:
 		unsigned int referenceID;
 	public:
-		glm::vec3 color = glm::vec3(1);
+		glm::vec3 color = glm::vec3(0);
 		glm::vec3 direction = glm::vec3(1);
 		bool visible = true;
 
@@ -83,7 +85,7 @@ namespace RenderEngine
 	private:
 		unsigned int referenceID;
 	public:
-		glm::vec3 color = glm::vec3(1);
+		glm::vec3 color = glm::vec3(0);
 		glm::vec3 position = glm::vec3(0);
 		float radius = 1;
 		bool visible = true;

@@ -28,10 +28,10 @@ namespace AssetLibrary
 	{ vec4(1,-1,-1, 1), down, right, vec2(1,0) },
 	{ vec4(-1,-1,-1, 1), down, right, vec2(0,0) },
 		// Top
-	{ vec4(-1, 1, 1, 1), up, right, vec2(0,1) },
-	{ vec4(1, 1, 1, 1), up, right, vec2(1,1) },
-	{ vec4(1, 1,-1, 1), up, right, vec2(1,0) },
-	{ vec4(-1, 1,-1, 1), up, right, vec2(0,0) },
+	{ vec4(-1, 1, 1, 1), up, left, vec2(0,1) },
+	{ vec4(1, 1, 1, 1), up, left, vec2(1,1) },
+	{ vec4(1, 1,-1, 1), up, left, vec2(1,0) },
+	{ vec4(-1, 1,-1, 1), up, left, vec2(0,0) },
 		// back
 	{ vec4(-1, 1, -1, 1), backward, left, vec2(0,1) },
 	{ vec4(1, 1, -1, 1), backward, left, vec2(1,1) },
@@ -43,15 +43,15 @@ namespace AssetLibrary
 	{ vec4(1, -1,1, 1), forward,  right, vec2(1,0) },
 	{ vec4(-1, -1,1, 1), forward, right, vec2(0,0) },
 		// left
-	{ vec4(-1, 1,-1, 1), left, forward, vec2(1,0) },
-	{ vec4(-1, 1, 1, 1), left, forward, vec2(1,1) },
-	{ vec4(-1,-1, 1, 1), left, forward, vec2(0,1) },
-	{ vec4(-1,-1,-1, 1), left, forward, vec2(0,0) },
+	{ vec4(-1, 1,-1, 1), left, backward, vec2(1,0) },
+	{ vec4(-1, 1, 1, 1), left, backward, vec2(1,1) },
+	{ vec4(-1,-1, 1, 1), left, backward, vec2(0,1) },
+	{ vec4(-1,-1,-1, 1), left, backward, vec2(0,0) },
 		// right
-	{ vec4(1, 1,-1, 1), right, backward, vec2(1,0) },
-	{ vec4(1, 1, 1, 1), right, backward, vec2(1,1) },
-	{ vec4(1,-1, 1, 1), right, backward, vec2(0,1) },
-	{ vec4(1,-1,-1, 1), right, backward, vec2(0,0) },
+	{ vec4(1, 1,-1, 1), right, forward, vec2(1,0) },
+	{ vec4(1, 1, 1, 1), right, forward, vec2(1,1) },
+	{ vec4(1,-1, 1, 1), right, forward, vec2(0,1) },
+	{ vec4(1,-1,-1, 1), right, forward, vec2(0,0) },
 	};
 
 	const unsigned CubeIndex[] = {

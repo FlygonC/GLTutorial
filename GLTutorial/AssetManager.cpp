@@ -200,22 +200,29 @@ bool AssetLibrary::AssetManager::loadFBX(const char* name, const char* path)
 			fbxData[j].tangent = m->m_vertices[j].tangent;
 			fbxData[j].texcoord = m->m_vertices[j].texCoord1;
 		}
-		buildVAO(m->m_name.c_str(), fbxData.data(), m->m_vertices.size(), m->m_indices.data(), m->m_indices.size());
+
+		buildVAO(name, fbxData.data(), m->m_vertices.size(), m->m_indices.data(), m->m_indices.size());
 
 		//Diffuse Map
 		if (m->m_material->textures[FBXMaterial::DiffuseTexture] != NULL)
 		{
-			loadTexture(m->m_material->textures[FBXMaterial::DiffuseTexture]->name.c_str(), m->m_material->textures[FBXMaterial::DiffuseTexture]->path.c_str());
+			std::string nameT;
+			nameT = name + std::string("Diffuse");
+			loadTexture(nameT.c_str(), m->m_material->textures[FBXMaterial::DiffuseTexture]->path.c_str());
 		}
 		//Normal Map
 		if (m->m_material->textures[FBXMaterial::NormalTexture] != NULL)
 		{
-			loadTexture(m->m_material->textures[FBXMaterial::NormalTexture]->name.c_str(), m->m_material->textures[FBXMaterial::NormalTexture]->path.c_str());
+			std::string nameT;
+			nameT = name + std::string("Normal");
+			loadTexture(nameT.c_str(), m->m_material->textures[FBXMaterial::NormalTexture]->path.c_str());
 		}
 		//Specular Map
 		if (m->m_material->textures[FBXMaterial::SpecularTexture] != NULL)
 		{
-			loadTexture(m->m_material->textures[FBXMaterial::SpecularTexture]->name.c_str(), m->m_material->textures[FBXMaterial::SpecularTexture]->path.c_str());
+			std::string nameT;
+			nameT = name + std::string("Specular");
+			loadTexture(nameT.c_str(), m->m_material->textures[FBXMaterial::SpecularTexture]->path.c_str());
 		}
 	}
 	file.unload();
@@ -242,6 +249,8 @@ bool AssetLibrary::AssetManager::init()
 	buildTexture("Test", 2, 2, GL_RGBA, test);
 	unsigned char white[] = { 255, 255, 255, 255 };
 	buildTexture("White", 1, 1, GL_RGBA, white);
+	unsigned char black[] = { 0, 0, 0, 255 };
+	buildTexture("Black", 1, 1, GL_RGBA, black);
 	unsigned char flat[] = { 127, 127, 255, 255 };
 	buildTexture("Flat", 1, 1, GL_RGBA, flat);
 

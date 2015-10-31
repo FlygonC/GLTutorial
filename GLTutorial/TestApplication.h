@@ -13,7 +13,10 @@ class TestApplication : public AssetLibrary::Application
 	FlyCamera camera;
 
 	RenderEngine::RenderObjectEx cube;
+	RenderEngine::RenderObjectEx ground;
+
 	RenderEngine::DirectionalLightEx dLight;
+
 	RenderEngine::PointLightEx pLight;
 	RenderEngine::PointLightEx pLight2;
 	RenderEngine::PointLightEx pLight3;
