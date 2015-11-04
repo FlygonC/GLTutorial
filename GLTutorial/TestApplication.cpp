@@ -11,16 +11,16 @@ void TestApplication::onInit()
 	camera.setSpeed(5, 0.1f);
 	camera.setPosition(glm::vec3(0, 0, -4));
 
-	cube.mesh = "SoulSpear";
-	cube.material.diffuseTexture = "SoulSpearDiffuse";
-	cube.material.normalTexture = "SoulSpearNormal";
-	cube.material.specularTexture = "SoulSpearSpecular";
+	cube.mesh = "Cube";
+	cube.material.diffuseTexture = "Test";
+	cube.material.normalTexture = "BlockNorm";
+	cube.material.specularTexture = "Test";
 	cube.material.specularPower = 8;
 
 	ground.mesh = "Cube";
 	ground.material.diffuseTexture = "Test";
-	ground.material.normalTexture = "Flat";
-	ground.material.specularTexture = "Black";
+	ground.material.normalTexture = "BlockNorm";
+	ground.material.specularTexture = "Test";
 	ground.material.specularPower = 0;
 	ground.transform.rotation.x = glm::radians(10.f);
 	ground.transform.scale = glm::vec3(10, 0.1f, 10);
@@ -29,20 +29,20 @@ void TestApplication::onInit()
 	dLight.color = glm::vec3(0.1f, 0.1f, 0.1f);
 	dLight.direction = glm::vec3(1.f, 1.f, 1.f);
 
-	pLight.color = glm::vec3(1, 0.3f, 0.3f);
-	pLight.position = glm::vec3(-2, 2, -2);
+	pLight.color = glm::vec3(1.f, 0.3f, 0.3f);
+	pLight.position = glm::vec3(-2.f, 2.f, -2.f);
 	pLight.radius = 5;
 
-	pLight2.color = glm::vec3(0.3f, 1, 0.3f);
-	pLight2.position = glm::vec3(2, 2, 2);
+	pLight2.color = glm::vec3(0.3f, 1.f, 0.3f);
+	pLight2.position = glm::vec3(2.f, 2.f, 2.f);
 	pLight2.radius = 5;
 
-	pLight3.color = glm::vec3(0.3f, 0.3f, 1);
-	pLight3.position = glm::vec3(2, -2, 2);
+	pLight3.color = glm::vec3(0.3f, 0.3f, 1.f);
+	pLight3.position = glm::vec3(2.f, -2.f, 2.f);
 	pLight3.radius = 5;
 
-	pLight4.color = glm::vec3(1, 1, 1);
-	pLight4.position = glm::vec3(0, -2.5f, 0);
+	pLight4.color = glm::vec3(1.f, 1.f, 1.f);
+	pLight4.position = glm::vec3(0.f, -2.5f, 0.f);
 	pLight4.radius = 5;
 }
 

@@ -242,7 +242,7 @@ bool AssetLibrary::AssetManager::init()
 	buildVAO("Quad", QuadVerts, 4, QuadIndex, 6);
 	buildVAO("Cube", CubeVerts, 24, CubeIndex, 36);
 
-	unsigned char test[] = { 255, 255, 255, 255,   255, 255, 0, 255,
+	unsigned char test[] = { 255, 255, 255, 255,   255, 0, 0, 255,
 							 0, 255, 0, 255,   0, 0, 255, 255 };
 
 	//unsigned char t2[] = {255,255,0,255};

@@ -19,6 +19,7 @@ void main() {
 	
 	FragColour = vec4((albedo * lightK) + (specular * lightS), 1);
 
-//	FragColour = vec4( (specular * lightS), 1);
+//	FragColour = vec4( (specular), 1);
+//	FragColour = vec4( (albedo * lightK), 1);
 
 }
