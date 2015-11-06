@@ -12,14 +12,18 @@ layout(location = 0) out vec3 gpassAlbedo;
 layout(location = 1) out vec3 gpassPosition;
 layout(location = 2) out vec3 gpassNormal;
 layout(location = 3) out vec4 gpassSpecular;
+layout(location = 4) out vec3 gpassGlow;
 
 uniform mat4 View;
 
 uniform float specPower;
 
+uniform vec3 ambientLight;
+
 uniform sampler2D diffuseMap;
 uniform sampler2D normalMap;
 uniform sampler2D specularMap;
+uniform sampler2D glowMap;
 
 void main() {
 	
@@ -39,4 +43,7 @@ void main() {
 	//Specular
 	gpassSpecular.xyz = texture(specularMap, vTexCoord).xyz;
 	gpassSpecular.a = specPower;
+	
+	//Glow
+	gpassGlow = ambientLight + texture(glowMap, vTexCoord).xyz;
 }

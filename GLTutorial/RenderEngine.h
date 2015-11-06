@@ -10,6 +10,11 @@ using namespace AssetLibrary;
 
 namespace RenderEngine
 {
+	namespace UNIFORM
+	{
+		enum TYPE { NONE = 0, FLO1, FLO2, FLO3, FLO4, MAT4, INT1, TEX2, eSIZE };
+	}
+
 	struct Transform
 	{
 		glm::vec3 position = glm::vec3(0);
@@ -33,6 +38,7 @@ namespace RenderEngine
 		Asset<ASSET::TEXTURE> diffuseTexture;
 		Asset<ASSET::TEXTURE> normalTexture;
 		Asset<ASSET::TEXTURE> specularTexture;
+		Asset<ASSET::TEXTURE> glowTexture;
 
 		//Material() : diffuseTexture("White"), normalTexture("White"), specularTexture("White") {}
 		Material operator=(Material other)
@@ -46,6 +52,7 @@ namespace RenderEngine
 			this->diffuseTexture = other.diffuseTexture;
 			this->normalTexture = other.normalTexture;
 			this->specularTexture = other.specularTexture;
+			this->glowTexture = other.glowTexture;
 
 			return *this;
 		}
@@ -155,28 +162,33 @@ namespace RenderEngine
 		public:
 			void prep();
 			void post();
-			void draw(RenderObjectIn ob, Camera c);
+			//void draw(RenderObjectIn ob, Camera c);
+		};
+		class ShadowMapBuffer : public RenderPass
+		{
+			unsigned int fbo;
+			void buildFBO(unsigned int w, unsigned int h);
 		};
 		class DLightPassRender : public RenderPass
 		{
 		public:
 			void prep();
 			void post();
-			void draw(DirectionalLightIn li, Camera c);
+			//void draw(DirectionalLightIn li, Camera c);
 		};
 		class PLightPassRender : public RenderPass
 		{
 		public:
 			void prep();
 			void post();
-			void draw(PointLightIn li, Camera c);
+			//void draw(PointLightIn li, Camera c);
 		};
 		class CompositePassRender : public RenderPass
 		{
 		public:
 			void prep();
 			void post();
-			void draw();
+			//void draw();
 		};
 
 		std::vector<RenderObjectIn> objectList = std::vector<RenderObjectIn>();
@@ -188,6 +200,10 @@ namespace RenderEngine
 		PLightPassRender pLight;
 		CompositePassRender comp;
 
+		unsigned int boundShader;
+		unsigned int boundFrameBuffer;
+
+		glm::vec3 ambientLight = glm::vec3(0);
 		Camera camera;
 
 		Renderer() {}
@@ -195,6 +211,10 @@ namespace RenderEngine
 		unsigned int newObject();
 		unsigned int newDLight();
 		unsigned int newPLight();
+
+		void bindFBO(unsigned int fbo);
+		void bindShader(unsigned int shader);
+		bool setUniform(const char* name, UNIFORM::TYPE type, const void* value, unsigned count = 1, bool normalize = false);
 
 	public:
 		static Renderer &instance()

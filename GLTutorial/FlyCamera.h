@@ -9,7 +9,7 @@ public:
 	float rotationX = -45;
 	float rotationY = 45;
 	vec3 up;
-	vec3 worldPosition = vec3(3,4,3);
+	vec3 worldPosition = vec3(0, 0, 0);
 	Controller control;
 
 	void update(float dt);

@@ -30,26 +30,26 @@ void main() {
 	//vec4 viewDirection = cameraView * vec4(toLight, 0);
 	float d = max(0, dot(normal, normalize(toLight)));
 	
-	// simple linear falloff
-	float falloff = 1 - min(1, length(toLight) / lightRadius);
-	// Exponential falloff
-//	float falloff = 1 - min(1, (length(toLight) * length(toLight)) / lightRadius);
-	
-	//Specular Calculation
-	vec3 specular = texture(specularMap, texCoord).xyz;
-	float specularPower = texture(specularMap, texCoord).a;
-	
-	float is = 0;
-	if (specularPower > 0) {
-		vec3 V = normalize( cameraPosition - position );
-		vec3 Rm = reflect( -normalize(toLight), normal );
-	
-		is = max( 0, dot(V, Rm) );
-		is = pow( is, specularPower );
-	}
-	
-	//Output
 	if (d > 0) {
+		// simple linear falloff
+		float falloff = 1 - min(1, length(toLight) / lightRadius);
+		// Exponential falloff
+	//	float falloff = 1 - min(1, (length(toLight) * length(toLight)) / lightRadius);
+		
+		//Specular Calculation
+		vec3 specular = texture(specularMap, texCoord).xyz;
+		float specularPower = texture(specularMap, texCoord).a;
+		
+		float is = 0;
+		if (specularPower > 0) {
+			vec3 V = normalize( cameraPosition - position );
+			vec3 Rm = reflect( -normalize(toLight), normal );
+		
+			is = max( 0, dot(V, Rm) );
+			is = pow( is, specularPower );
+		}
+		
+		//Output
 		lightTexture = (lightDiffuse * d) * falloff;
 		specularTexture = ((specular * lightDiffuse) * is) * falloff;
 	} 

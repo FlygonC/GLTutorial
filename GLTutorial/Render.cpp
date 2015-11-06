@@ -1,5 +1,5 @@
 #include "Render.h"
-
+/*
 bool RenderEngine::RenderPass::setUniform(const char * name, UNIFORM::TYPE type, const void * value, unsigned count, bool normalize)
 {
 	int loc = glGetUniformLocation(AssetManager::instance().get<ASSET::SHADER>(shader.name.c_str()), name);
@@ -20,3 +20,4 @@ bool RenderEngine::RenderPass::setUniform(const char * name, UNIFORM::TYPE type,
 
 	return true;
 }
+*/

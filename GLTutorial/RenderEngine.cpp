@@ -162,6 +162,32 @@ void Renderer::clearPLight(unsigned int id)
 }
 
 
+void Renderer::bindShader(unsigned int shader)
+{
+	boundShader = shader;
+	glUseProgram(boundShader);
+}
+bool Renderer::setUniform(const char * name, UNIFORM::TYPE type, const void * value, unsigned count, bool normalize)
+{
+	int loc = glGetUniformLocation(boundShader, name);
+	switch (type)
+	{
+	case UNIFORM::FLO1: glUniform1fv(loc, count, (GLfloat*)value); break;
+	case UNIFORM::FLO2: glUniform2fv(loc, count, (GLfloat*)value); break;
+	case UNIFORM::FLO3: glUniform3fv(loc, count, (GLfloat*)value); break;
+	case UNIFORM::FLO4: glUniform4fv(loc, count, (GLfloat*)value); break;
+	case UNIFORM::MAT4: glUniformMatrix4fv(loc, count, normalize, (GLfloat*)value); break;
+	case UNIFORM::INT1: glUniform1i(loc, (GLint)value); break;
+	case UNIFORM::TEX2: glActiveTexture(GL_TEXTURE0 + count);
+		glBindTexture(GL_TEXTURE_2D, *(const GLuint*)value);
+		glUniform1i(loc, count);
+		break;
+	default: return false;
+	}
+
+	return true;
+}
+
 
 
 //management
@@ -189,25 +215,54 @@ void Renderer::init()
 	auto &a = AssetManager::instance();
 	auto &w = Window::instance();
 	//GPASS
-	const char* gpasstexturenames[] = { "GPassAlbedo", "GPassPosition", "GPassNormal", "GPassSpecular" };
-	const unsigned gpassdepths[] = { GL_RGB8, GL_RGB32F, GL_RGB32F, GL_RGBA32F };
-	a.buildFBO("GPassFrameBuffer", w.getWidth(), w.getHeight(), 4, gpasstexturenames, gpassdepths, true);
-	gPass.fbo = "GPassFrameBuffer";
+	const char* gpasstexturenames[] = { "GPassAlbedo", "GPassPosition", "GPassNormal", "GPassSpecular", "GPassGlow" };
+	const unsigned gpassdepths[] = { GL_RGB8, GL_RGB32F, GL_RGB32F, GL_RGBA32F, GL_RGB32F };
+	a.buildFBO("GPassFrameBuffer", w.getWidth(), w.getHeight(), 5, gpasstexturenames, gpassdepths, true);
+	//gPass.fbo = "GPassFrameBuffer";
 	a.loadShader("GPassShader", "./DeferredRendering/GPass/GVertex.txt", "./DeferredRendering/GPass/GFragment.txt");
-	gPass.shader = "GPassShader";
+	//gPass.shader = "GPassShader";
+
+	//SHADOW
+	unsigned int buffer;
+	glGenFramebuffers(1, &buffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, buffer);
+
+	//a.buildTexture("ShadowMap", 1024 * 4, 1024 * 4, GL_DEPTH_COMPONENT16);
+	unsigned int tbuffer;
+	glGenTextures(1, &tbuffer);
+	glBindTexture(GL_TEXTURE_2D, tbuffer);
+	glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT16, 1024 * 4, 1024 * 4);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	a.manualAsset("ShadowMap", ASSET::TEXTURE, tbuffer);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, AssetManager::instance().get<ASSET::TEXTURE>("ShadowMap"), 0);
+	
+	glDrawBuffer(GL_NONE);
+	
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	a.manualAsset("ShadowFrameBuffer", ASSET::FBO, buffer);
+	a.loadShader("ShadowShader", "./DeferredRendering/Light/ShadowVertex.txt", "./DeferredRendering/Light/ShadowFragment.txt");
+
 	//LIGHT
 	const char* lighttexturenames[] = { "LPassLight", "LPassSpecular" };
 	const unsigned lightdepths[] = { GL_RGB8, GL_RGB8 };
 	a.buildFBO("LightFrameBuffer", w.getWidth(), w.getHeight(), 2, lighttexturenames, lightdepths, false);
-	dLight.fbo = "LightFrameBuffer";
-	pLight.fbo = "LightFrameBuffer";
+	//dLight.fbo = "LightFrameBuffer";
+	//pLight.fbo = "LightFrameBuffer";
 	a.loadShader("DLightShader", "./DeferredRendering/Light/LightVertex.txt", "./DeferredRendering/Light/LightFragment.txt");
-	dLight.shader = "DLightShader";
+	//dLight.shader = "DLightShader";
 	a.loadShader("PLightShader", "./DeferredRendering/Light/PointLightVertex.txt", "./DeferredRendering/Light/PointLightFragment.txt");
-	pLight.shader = "PLightShader";
+	//pLight.shader = "PLightShader";
+
 	//COMP
 	a.loadShader("CompositeShader", "./DeferredRendering/Composite/CompVertex.txt", "./DeferredRendering/Composite/CompFragment.txt");
-	comp.shader = "CompositeShader";
+	//comp.shader = "CompositeShader";
 }
 
 void RenderEngine::Renderer::kill()
@@ -223,41 +278,202 @@ void RenderEngine::Renderer::setCamera(Camera c)
 	camera.projectionTransform = c.getProjection();
 }
 
+//RENDERING #$#$#$#$#$#$#$#$#$#$#$#
 void Renderer::render()
 {
-	//gpass
+	//gpass ########################
 	gPass.prep();
-	for each (RenderObjectIn i in objectList)
+	/*for each (RenderObjectIn i in objectList)
 	{
 		if (i.inUse && i.visible)
 		{
 			gPass.draw(i, camera);
 		}
+	}*/
+	//glUseProgram(AssetManager::instance().get<ASSET::SHADER>(shader.name.c_str()));
+	bindShader(AssetManager::instance().get<ASSET::SHADER>("GPassShader"));
+
+	setUniform("ProjectionView", UNIFORM::MAT4, glm::value_ptr(camera.getProjectionView()));
+	setUniform("View", UNIFORM::MAT4, glm::value_ptr(camera.getView()));
+
+	for each (RenderObjectIn i in objectList)
+	{
+		if (i.inUse && i.visible)
+		{
+			setUniform("ambientLight", UNIFORM::MAT4, glm::value_ptr(ambientLight));
+
+			setUniform("Model", UNIFORM::MAT4, glm::value_ptr(i.transform.get()));
+
+			setUniform("specPower", UNIFORM::FLO1, &i.material.specularPower);
+
+			setUniform("diffuseMap", UNIFORM::TEX2, i.material.diffuseTexture, 0);
+			setUniform("normalMap", UNIFORM::TEX2, i.material.normalTexture, 1);
+			setUniform("specularMap", UNIFORM::TEX2, i.material.specularTexture, 2);
+			setUniform("glowMap", UNIFORM::TEX2, i.material.glowTexture, 3);
+
+			glBindVertexArray(AssetManager::instance().get<ASSET::VAO>(i.mesh.name.c_str()));
+			glDrawElements(GL_TRIANGLES, AssetManager::instance().get<ASSET::SIZE>(i.mesh.name.c_str()), GL_UNSIGNED_INT, 0);
+		}
 	}
+
 	gPass.post();
-	//dlight
-	dLight.prep();
+
+	//PRE LIGHT CLEAR
+	glBindFramebuffer(GL_FRAMEBUFFER, AssetManager::instance().get<ASSET::FBO>("LightFrameBuffer"));
+	glClear(GL_COLOR_BUFFER_BIT);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	//Directional Light ########################
 	for each (DirectionalLightIn i in directionalLightList)
 	{
 		if (i.inUse && i.visible)
 		{
-			dLight.draw(i, camera);
+			//shadow %%%%%%%%
+/*prep*/	glm::vec3 m_lightDirection = glm::normalize(i.direction);
+			float projSize = 15;
+			glm::mat4 lightProjection = glm::ortho<float>(-projSize, projSize, -projSize, projSize, -projSize, projSize);
+			glm::mat4 lightView = glm::lookAt(m_lightDirection, glm::vec3(0), glm::vec3(0, 1, 0));
+			glm::mat4 m_lightMatrix = lightProjection * lightView;
+			glBindFramebuffer(GL_FRAMEBUFFER, AssetManager::instance().get<ASSET::FBO>("ShadowFrameBuffer"));
+
+			glEnable(GL_DEPTH_TEST);
+
+			glEnable(GL_CULL_FACE);
+			glFrontFace(GL_CCW);
+			glCullFace(GL_FRONT);
+
+			glViewport(0, 0, 1024 * 4, 1024 * 4);
+			glClear(GL_DEPTH_BUFFER_BIT);
+
+			bindShader(AssetManager::instance().get<ASSET::SHADER>("ShadowShader"));
+			setUniform("lightMatrix", UNIFORM::MAT4, glm::value_ptr(m_lightMatrix));
+
+/*draw*/	for each (RenderObjectIn j in objectList)
+			{
+				if (j.inUse && j.visible)
+				{
+					setUniform("Model", UNIFORM::MAT4, glm::value_ptr(j.transform.get()));
+
+					glBindVertexArray(AssetManager::instance().get<ASSET::VAO>(j.mesh.name.c_str()));
+					glDrawElements(GL_TRIANGLES, AssetManager::instance().get<ASSET::SIZE>(j.mesh.name.c_str()), GL_UNSIGNED_INT, 0);
+				}
+			}
+
+/*post*/	glViewport(0, 0, Window::instance().getWidth(), Window::instance().getHeight());
+			glDisable(GL_DEPTH_TEST);
+			glFrontFace(GL_CCW);
+			glDisable(GL_CULL_FACE);
+
+
+			//light %%%%%%%%
+			dLight.prep();
+
+			bindShader(AssetManager::instance().get<ASSET::SHADER>("DLightShader"));
+
+			setUniform("cameraView", UNIFORM::MAT4, glm::value_ptr(camera.getView()));
+
+			glm::vec3 d = glm::vec3(camera.getWorldTransform()[3]);
+			//std::cout << d.x << " " << d.y << " " << d.z << std::endl;
+			setUniform("cameraPosition", UNIFORM::FLO3, glm::value_ptr(d));
+		
+			setUniform("lightDirection", UNIFORM::FLO3, glm::value_ptr(i.direction));
+			setUniform("lightDiffuse", UNIFORM::FLO3, glm::value_ptr(i.color));
+
+			setUniform("lightMatrix", UNIFORM::MAT4, glm::value_ptr(m_lightMatrix));
+
+			Asset<ASSET::TEXTURE> p;
+			p = "GPassPosition";
+			Asset<ASSET::TEXTURE> n;
+			n = "GPassNormal";
+			Asset<ASSET::TEXTURE> s;
+			s = "GPassSpecular";
+			Asset<ASSET::TEXTURE> h;
+			h = "ShadowMap";
+
+			setUniform("positionTexture", UNIFORM::TEX2, &p, 0);
+			setUniform("normalTexture", UNIFORM::TEX2, &n, 1);
+			setUniform("specularMap", UNIFORM::TEX2, &s, 2);
+			setUniform("shadowMap", UNIFORM::TEX2, &h, 3);
+
+			glBindVertexArray(AssetManager::instance().get<ASSET::VAO>("Quad"));
+			glDrawElements(GL_TRIANGLES, AssetManager::instance().get<ASSET::SIZE>("Quad"), GL_UNSIGNED_INT, 0);
 		}
 	}
+
 	dLight.post();
-	//plight
+
+
+	//plight ########################
 	pLight.prep();
-	for each (PointLightIn i in pointLightList)
+	/*for each (PointLightIn i in pointLightList)
 	{
 		if (i.inUse && i.visible)
 		{
 			pLight.draw(i, camera);
 		}
+	}*/
+	bindShader(AssetManager::instance().get<ASSET::SHADER>("PLightShader"));
+
+	for each (PointLightIn i in pointLightList)
+	{
+		if (i.inUse && i.visible)
+		{
+			setUniform("ProjectionView", UNIFORM::MAT4, glm::value_ptr(camera.getProjectionView()));
+			setUniform("cameraView", UNIFORM::MAT4, glm::value_ptr(camera.getView()));
+			setUniform("cameraPosition", UNIFORM::FLO3, glm::value_ptr(camera.getWorldTransform()[3]));
+
+			setUniform("lightPositionView", UNIFORM::FLO3, glm::value_ptr(camera.getView() * glm::vec4(i.position, 1)));
+
+			setUniform("lightPosition", UNIFORM::FLO3, glm::value_ptr(i.position));
+			setUniform("lightDiffuse", UNIFORM::FLO3, glm::value_ptr(i.color));
+			setUniform("lightRadius", UNIFORM::FLO1, &i.radius);
+
+			Asset<ASSET::TEXTURE> p;
+			p = "GPassPosition";
+			Asset<ASSET::TEXTURE> n;
+			n = "GPassNormal";
+			Asset<ASSET::TEXTURE> s;
+			s = "GPassSpecular";
+
+			setUniform("positionTexture", UNIFORM::TEX2, &p, 0);
+			setUniform("normalTexture", UNIFORM::TEX2, &n, 1);
+			setUniform("specularMap", UNIFORM::TEX2, &s, 2);
+
+			glBindVertexArray(AssetManager::instance().get<ASSET::VAO>("Cube"));
+			glDrawElements(GL_TRIANGLES, AssetManager::instance().get<ASSET::SIZE>("Cube"), GL_UNSIGNED_INT, 0);
+		}
 	}
+
 	pLight.post();
-	//comp
+
+
+	//comp ########################
 	comp.prep();
-	comp.draw();
+	//comp.draw();
+	bindShader(AssetManager::instance().get<ASSET::SHADER>("CompositeShader"));
+
+	Asset<ASSET::TEXTURE> g;
+	g = "GPassGlow";
+	Asset<ASSET::TEXTURE> a;
+	a = "GPassAlbedo";
+	//a = "";
+	Asset<ASSET::TEXTURE> l;
+	l = "LPassLight";
+	Asset<ASSET::TEXTURE> s;
+	s = "GPassSpecular";
+	Asset<ASSET::TEXTURE> ls;
+	ls = "LPassSpecular";
+
+	setUniform("glowTexture", UNIFORM::TEX2, &g, 0);
+	setUniform("albedoTexture", UNIFORM::TEX2, &a, 1);
+	setUniform("lightTexture", UNIFORM::TEX2, &l, 2);
+	setUniform("specularTexture", UNIFORM::TEX2, &s, 3);
+	setUniform("specularTexture", UNIFORM::TEX2, &ls, 4);
+
+
+	glBindVertexArray(AssetManager::instance().get<ASSET::VAO>("Quad"));
+	glDrawElements(GL_TRIANGLES, AssetManager::instance().get<ASSET::SIZE>("Quad"), GL_UNSIGNED_INT, 0);
+
 	comp.post();
 }
 
@@ -267,7 +483,7 @@ void Renderer::render()
 
 void Renderer::GPassRender::prep()
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, AssetManager::instance().get<ASSET::FBO>(fbo.name.c_str()));
+	glBindFramebuffer(GL_FRAMEBUFFER, AssetManager::instance().get<ASSET::FBO>("GPassFrameBuffer"));
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -281,7 +497,7 @@ void Renderer::GPassRender::post()
 	glUseProgram(0);
 }
 
-void RenderEngine::Renderer::GPassRender::draw(RenderObjectIn ob, Camera c)
+/*void RenderEngine::Renderer::GPassRender::draw(RenderObjectIn ob, Camera c)
 {
 	glUseProgram(AssetManager::instance().get<ASSET::SHADER>(shader.name.c_str()));
 
@@ -298,15 +514,18 @@ void RenderEngine::Renderer::GPassRender::draw(RenderObjectIn ob, Camera c)
 
 	glBindVertexArray(AssetManager::instance().get<ASSET::VAO>(ob.mesh.name.c_str()));
 	glDrawElements(GL_TRIANGLES, AssetManager::instance().get<ASSET::SIZE>(ob.mesh.name.c_str()), GL_UNSIGNED_INT, 0);
-}
+	
+}*/
+
+
 
 
 
 void RenderEngine::Renderer::DLightPassRender::prep()
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, AssetManager::instance().get<ASSET::FBO>(fbo.name.c_str()));
+	glBindFramebuffer(GL_FRAMEBUFFER, AssetManager::instance().get<ASSET::FBO>("LightFrameBuffer"));
 
-	glClear(GL_COLOR_BUFFER_BIT);
+	//glClear(GL_COLOR_BUFFER_BIT);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE);
@@ -319,9 +538,11 @@ void RenderEngine::Renderer::DLightPassRender::post()
 	glUseProgram(0);
 }
 
-void RenderEngine::Renderer::DLightPassRender::draw(DirectionalLightIn li, Camera c)
+/*void RenderEngine::Renderer::DLightPassRender::draw(DirectionalLightIn li, Camera c)
 {
-	glUseProgram(AssetManager::instance().get<ASSET::SHADER>(shader.name.c_str()));
+	//Do Shadow here
+
+	//glUseProgram(AssetManager::instance().get<ASSET::SHADER>(shader.name.c_str()));
 
 	setUniform("cameraView", UNIFORM::MAT4, glm::value_ptr(c.getView()));
 	setUniform("cameraPosition", UNIFORM::FLO3, glm::value_ptr(c.getWorldTransform()[3]));
@@ -342,13 +563,15 @@ void RenderEngine::Renderer::DLightPassRender::draw(DirectionalLightIn li, Camer
 
 	glBindVertexArray(AssetManager::instance().get<ASSET::VAO>("Quad"));
 	glDrawElements(GL_TRIANGLES, AssetManager::instance().get<ASSET::SIZE>("Quad"), GL_UNSIGNED_INT, 0);
-}
+}*/
+
+
 
 
 
 void RenderEngine::Renderer::PLightPassRender::prep()
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, AssetManager::instance().get<ASSET::FBO>(fbo.name.c_str()));
+	glBindFramebuffer(GL_FRAMEBUFFER, AssetManager::instance().get<ASSET::FBO>("LightFrameBuffer"));
 
 	//glClear(GL_COLOR_BUFFER_BIT);
 
@@ -368,7 +591,7 @@ void RenderEngine::Renderer::PLightPassRender::post()
 	glUseProgram(0);
 }
 
-void RenderEngine::Renderer::PLightPassRender::draw(PointLightIn li, Camera c)
+/*void RenderEngine::Renderer::PLightPassRender::draw(PointLightIn li, Camera c)
 {
 	glUseProgram(AssetManager::instance().get<ASSET::SHADER>(shader.name.c_str()));
 
@@ -395,7 +618,7 @@ void RenderEngine::Renderer::PLightPassRender::draw(PointLightIn li, Camera c)
 
 	glBindVertexArray(AssetManager::instance().get<ASSET::VAO>("Cube"));
 	glDrawElements(GL_TRIANGLES, AssetManager::instance().get<ASSET::SIZE>("Cube"), GL_UNSIGNED_INT, 0);
-}
+}*/
 
 
 
@@ -415,7 +638,7 @@ void RenderEngine::Renderer::CompositePassRender::post()
 	glUseProgram(0);
 }
 
-void RenderEngine::Renderer::CompositePassRender::draw()
+/*void RenderEngine::Renderer::CompositePassRender::draw()
 {
 	glUseProgram(AssetManager::instance().get<ASSET::SHADER>(shader.name.c_str()));
 
@@ -436,4 +659,4 @@ void RenderEngine::Renderer::CompositePassRender::draw()
 
 	glBindVertexArray(AssetManager::instance().get<ASSET::VAO>("Quad"));
 	glDrawElements(GL_TRIANGLES, AssetManager::instance().get<ASSET::SIZE>("Quad"), GL_UNSIGNED_INT, 0);
-}
+}*/

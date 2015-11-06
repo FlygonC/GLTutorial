@@ -137,6 +137,9 @@ bool AssetLibrary::AssetManager::buildTexture(const char* name, unsigned int w, 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	return true;
@@ -233,6 +236,12 @@ bool AssetLibrary::AssetManager::loadFBX(const char* name, const char* path)
 bool AssetLibrary::AssetManager::loadOBJ(const char* name, const char* path)
 {
 	return false;
+}
+
+bool AssetLibrary::AssetManager::manualAsset(const char * name, ASSET::GL_Handle_Type type, unsigned int handel)
+{
+	setInternal(type, name, handel);
+	return true;
 }
 
 bool AssetLibrary::AssetManager::init()

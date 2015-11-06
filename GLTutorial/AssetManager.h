@@ -94,6 +94,8 @@ namespace AssetLibrary
 		bool loadFBX		(const char* name, const char* path);
 		bool loadOBJ		(const char* name, const char* path);
 
+		bool manualAsset(const char* name, ASSET::GL_Handle_Type type, unsigned int handel);
+
 		bool init();
 		void kill();
 	};

@@ -5,7 +5,14 @@ layout (location = 3) in vec2 texCoord;
 
 out vec2 fTexCoord;
 
+out vec4 vShadowCoord;
+
 void main() {
 	gl_Position = position;
 	fTexCoord = texCoord;
+	
+//	mat4 TSO = mat4(vec4(0.5, 0.0, 0.0, 0.0)
+//					vec4(0.0, 0.5, 0.0, 0.0)
+//					vec4(0.0, 0.0, 0.5, 0.0)
+//					vec4(0.5, 0.5, 0.5, 1.0));
 }
