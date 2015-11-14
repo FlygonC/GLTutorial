@@ -33,6 +33,7 @@ namespace RenderEngine
 	{
 		glm::vec3 diffuseTint = glm::vec3(0);
 		glm::vec3 specularTint = glm::vec3(0);
+		glm::vec3 glowTint = glm::vec3(0);
 		float specularPower = 0;
 
 		Asset<ASSET::TEXTURE> diffuseTexture;
@@ -45,7 +46,7 @@ namespace RenderEngine
 		{
 			this->diffuseTint = other.diffuseTint;
 			this->specularTint = other.specularTint;
-			this->diffuseTint = other.diffuseTint;
+			this->glowTint = other.glowTint;
 
 			this->specularPower = other.specularPower;
 
@@ -103,6 +104,44 @@ namespace RenderEngine
 		unsigned int getReferenceID();
 	};
 	
+
+	template<typename T>
+	struct Range
+	{
+		T start, end;
+		operator=(T other)
+		{
+			start = other;
+			end = other;
+		}
+	};
+	struct Particle
+	{
+		Transform trans;
+		Material mat;
+		glm::vec3 direction = glm::vec3(0);
+		float velocity;
+		float lifeTime = 0;
+	};
+	class ParticleEmitterEx
+	{
+		unsigned int referenceID;
+		//Particle particles[50];
+	public:
+		Range<Transform> transform;
+		Range<float> velocity;
+		Range<glm::vec3> direction;
+		Range<glm::vec3> color;
+		float maxLife;
+		float emittionRate;
+
+		Asset<ASSET::VAO> mesh;
+
+		void instantiate();
+		void update();
+		void destroy();
+		unsigned int getReferenceID();
+	};
 	
 	class Renderer
 	{
@@ -157,6 +196,47 @@ namespace RenderEngine
 			}
 		};
 
+		class ParticleEmitterIn
+		{
+		public:
+			Particle particles[50];
+
+			Range<Transform> transform;
+			Range<float> velocity;
+			Range<glm::vec3> direction;
+			Range<glm::vec3> color;
+			float maxLife;
+			float emittionRate;
+
+			Asset<ASSET::VAO> mesh;
+
+			bool inUse = false;
+
+			void createPart()
+			{
+				particles[currentPart].trans = transform.start;
+				particles[currentPart].velocity = velocity.start;
+				particles[currentPart].direction = glm::lerp(direction.start, direction.end, 1.f);
+			}
+			void update(float deltaTime);
+
+			ParticleEmitterIn operator=(ParticleEmitterEx other)
+			{
+				this->transform = other.transform;
+				this->velocity = other.velocity;
+				this->direction = other.direction;
+				this->color = other.color;
+				this->maxLife = other.maxLife;
+				this->emittionRate = other.emittionRate;
+
+				this->mesh = other.mesh;
+
+				return *this;
+			}
+		private:
+			int currentPart = 0;
+		};
+
 		class GPassRender : public RenderPass
 		{
 		public:
@@ -164,11 +244,7 @@ namespace RenderEngine
 			void post();
 			//void draw(RenderObjectIn ob, Camera c);
 		};
-		class ShadowMapBuffer : public RenderPass
-		{
-			unsigned int fbo;
-			void buildFBO(unsigned int w, unsigned int h);
-		};
+		
 		class DLightPassRender : public RenderPass
 		{
 		public:
@@ -194,6 +270,7 @@ namespace RenderEngine
 		std::vector<RenderObjectIn> objectList = std::vector<RenderObjectIn>();
 		std::vector<DirectionalLightIn> directionalLightList = std::vector<DirectionalLightIn>();
 		std::vector<PointLightIn> pointLightList = std::vector<PointLightIn>();
+		std::vector<ParticleEmitterIn> emitterList = std::vector<ParticleEmitterIn>();
 
 		GPassRender gPass;
 		DLightPassRender dLight;
@@ -203,7 +280,7 @@ namespace RenderEngine
 		unsigned int boundShader;
 		unsigned int boundFrameBuffer;
 
-		glm::vec3 ambientLight = glm::vec3(0);
+		glm::vec3 ambientLight = glm::vec3(0.5f);
 		Camera camera;
 
 		Renderer() {}
@@ -211,8 +288,9 @@ namespace RenderEngine
 		unsigned int newObject();
 		unsigned int newDLight();
 		unsigned int newPLight();
+		unsigned int newEmitter();
 
-		void bindFBO(unsigned int fbo);
+		//void bindFBO(unsigned int fbo);
 		void bindShader(unsigned int shader);
 		bool setUniform(const char* name, UNIFORM::TYPE type, const void* value, unsigned count = 1, bool normalize = false);
 
@@ -237,6 +315,10 @@ namespace RenderEngine
 		unsigned int createPLight(PointLightEx* in);
 		void updatePLight(PointLightEx* in, unsigned int id);
 		void clearPLight(unsigned int id);
+
+		unsigned int createEmitter(ParticleEmitterEx* in);
+		void updateEmitter(ParticleEmitterEx* in, unsigned int id);
+		void clearEmitter(unsigned int id);
 		
 		void setCamera(Camera c);
 

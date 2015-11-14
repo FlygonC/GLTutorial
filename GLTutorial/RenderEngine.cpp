@@ -162,6 +162,61 @@ void Renderer::clearPLight(unsigned int id)
 }
 
 
+
+// Particle Emitter ################
+void ParticleEmitterEx::instantiate()
+{
+	referenceID = Renderer::instance().createEmitter(this);
+}
+
+void ParticleEmitterEx::update()
+{
+	Renderer::instance().updateEmitter(this, referenceID);
+}
+
+void ParticleEmitterEx::destroy()
+{
+	Renderer::instance().clearEmitter(referenceID);
+}
+
+unsigned int ParticleEmitterEx::getReferenceID()
+{
+	return referenceID;
+}
+//internal
+unsigned int Renderer::newEmitter()
+{
+	//Search for an object in vector tagged Unused
+	for (unsigned i = 0; i < emitterList.size(); i++)
+	{
+		if (emitterList[i].inUse == false)
+		{
+			return i;
+		}
+	}
+	return emitterList.size() - 1;
+}
+unsigned int Renderer::createEmitter(ParticleEmitterEx* in)
+{
+	unsigned int slot = newEmitter();
+	emitterList[slot] = *in;
+	emitterList[slot].inUse = true;
+	return slot;
+}
+
+void Renderer::updateEmitter(ParticleEmitterEx* in, unsigned int id)
+{
+	emitterList[id] = *in;
+}
+
+void Renderer::clearPLight(unsigned int id)
+{
+	emitterList[id].inUse = false;
+}
+
+
+
+// Rendering ##########################################
 void Renderer::bindShader(unsigned int shader)
 {
 	boundShader = shader;
@@ -231,7 +286,7 @@ void Renderer::init()
 	unsigned int tbuffer;
 	glGenTextures(1, &tbuffer);
 	glBindTexture(GL_TEXTURE_2D, tbuffer);
-	glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT16, 1024 * 4, 1024 * 4);
+	glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT16, 1024 * 16, 1024 * 16);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
@@ -296,15 +351,19 @@ void Renderer::render()
 	setUniform("ProjectionView", UNIFORM::MAT4, glm::value_ptr(camera.getProjectionView()));
 	setUniform("View", UNIFORM::MAT4, glm::value_ptr(camera.getView()));
 
+	setUniform("ambientLight", UNIFORM::FLO3, glm::value_ptr(ambientLight));
+
 	for each (RenderObjectIn i in objectList)
 	{
 		if (i.inUse && i.visible)
 		{
-			setUniform("ambientLight", UNIFORM::MAT4, glm::value_ptr(ambientLight));
-
 			setUniform("Model", UNIFORM::MAT4, glm::value_ptr(i.transform.get()));
 
 			setUniform("specPower", UNIFORM::FLO1, &i.material.specularPower);
+
+			setUniform("diffuseTint", UNIFORM::FLO3, glm::value_ptr(i.material.diffuseTint));
+			setUniform("specularTint", UNIFORM::FLO3, glm::value_ptr(i.material.specularTint));
+			setUniform("glowTint", UNIFORM::FLO3, glm::value_ptr(i.material.glowTint));
 
 			setUniform("diffuseMap", UNIFORM::TEX2, i.material.diffuseTexture, 0);
 			setUniform("normalMap", UNIFORM::TEX2, i.material.normalTexture, 1);
@@ -330,9 +389,10 @@ void Renderer::render()
 		{
 			//shadow %%%%%%%%
 /*prep*/	glm::vec3 m_lightDirection = glm::normalize(i.direction);
-			float projSize = 15;
+			float projSize = 200;
 			glm::mat4 lightProjection = glm::ortho<float>(-projSize, projSize, -projSize, projSize, -projSize, projSize);
-			glm::mat4 lightView = glm::lookAt(m_lightDirection, glm::vec3(0), glm::vec3(0, 1, 0));
+			glm::mat4 lightView = glm::lookAt(glm::vec3(camera.getView()[3]), glm::vec3(camera.getView()[3]) - m_lightDirection, glm::vec3(0, 1, 0));
+			//lightView[3].x = camera.getView()[3].x; lightView[3].y = camera.getView()[3].y; lightView[3].z = camera.getView()[3].z;
 			glm::mat4 m_lightMatrix = lightProjection * lightView;
 			glBindFramebuffer(GL_FRAMEBUFFER, AssetManager::instance().get<ASSET::FBO>("ShadowFrameBuffer"));
 
@@ -342,7 +402,7 @@ void Renderer::render()
 			glFrontFace(GL_CCW);
 			glCullFace(GL_FRONT);
 
-			glViewport(0, 0, 1024 * 4, 1024 * 4);
+			glViewport(0, 0, 1024 * 16, 1024 * 16);
 			glClear(GL_DEPTH_BUFFER_BIT);
 
 			bindShader(AssetManager::instance().get<ASSET::SHADER>("ShadowShader"));
@@ -405,13 +465,7 @@ void Renderer::render()
 
 	//plight ########################
 	pLight.prep();
-	/*for each (PointLightIn i in pointLightList)
-	{
-		if (i.inUse && i.visible)
-		{
-			pLight.draw(i, camera);
-		}
-	}*/
+	
 	bindShader(AssetManager::instance().get<ASSET::SHADER>("PLightShader"));
 
 	for each (PointLightIn i in pointLightList)
@@ -456,7 +510,7 @@ void Renderer::render()
 	g = "GPassGlow";
 	Asset<ASSET::TEXTURE> a;
 	a = "GPassAlbedo";
-	//a = "";
+	//a = "GPassNormal";
 	Asset<ASSET::TEXTURE> l;
 	l = "LPassLight";
 	Asset<ASSET::TEXTURE> s;
@@ -468,7 +522,7 @@ void Renderer::render()
 	setUniform("albedoTexture", UNIFORM::TEX2, &a, 1);
 	setUniform("lightTexture", UNIFORM::TEX2, &l, 2);
 	setUniform("specularTexture", UNIFORM::TEX2, &s, 3);
-	setUniform("specularTexture", UNIFORM::TEX2, &ls, 4);
+	setUniform("specularity", UNIFORM::TEX2, &ls, 4);
 
 
 	glBindVertexArray(AssetManager::instance().get<ASSET::VAO>("Quad"));

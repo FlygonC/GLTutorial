@@ -51,7 +51,7 @@ void main() {
 		
 		//Output
 		lightTexture = (lightDiffuse * d) * falloff;
-		specularTexture = ((specular * lightDiffuse) * is) * falloff;
+		specularTexture = (lightDiffuse * is) * falloff;
 	} 
 	if (d <= 0) {
 		lightTexture = vec3(0);

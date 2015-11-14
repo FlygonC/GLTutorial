@@ -20,6 +20,10 @@ uniform float specPower;
 
 uniform vec3 ambientLight;
 
+uniform vec3 diffuseTint;
+uniform vec3 specularTint;
+uniform vec3 glowTint;
+
 uniform sampler2D diffuseMap;
 uniform sampler2D normalMap;
 uniform sampler2D specularMap;
@@ -28,7 +32,7 @@ uniform sampler2D glowMap;
 void main() {
 	
 	//Color
-	gpassAlbedo = texture(diffuseMap, vTexCoord).xyz;
+	gpassAlbedo = diffuseTint + texture(diffuseMap, vTexCoord).xyz;
 	
 	//Position
 	gpassPosition = vPosition.xyz;
@@ -41,9 +45,9 @@ void main() {
 	gpassNormal = (View * vec4(TBN * N,0)).xyz;
 
 	//Specular
-	gpassSpecular.xyz = texture(specularMap, vTexCoord).xyz;
+	gpassSpecular.xyz = specularTint + texture(specularMap, vTexCoord).xyz;
 	gpassSpecular.a = specPower;
 	
 	//Glow
-	gpassGlow = ambientLight + texture(glowMap, vTexCoord).xyz;
+	gpassGlow = glowTint + ambientLight + texture(glowMap, vTexCoord).xyz;
 }

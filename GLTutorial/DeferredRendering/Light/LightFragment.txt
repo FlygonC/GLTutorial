@@ -41,12 +41,41 @@ void main() {
 		
 	vec4 shadowPosition = clipToUV * lightProjected; // Need clipToUV uniform and lightMatrix uniform
 	
-	
 		// Test the Shadow Position against the Shadow Map : (Using the shadow Position as UV coords!)
-	bool isLit = shadowPosition.z < texture(shadowMap, shadowPosition.xy).z + 0.001;
-	if (!isLit) {
-		d = 0;
+//	bool isLit = shadowPosition.z < texture(shadowMap, shadowPosition.xy).z + 0.0;
+//	if (!isLit) {
+//		d = 0;
+//	}
+
+//Soft Shadow
+	float shadowFinal = 0;
+	
+	vec2 texel = 1.0 / textureSize(shadowMap, 0).xy;
+	float bias = (texel.x + texel.y) / 2;
+	
+	if (shadowPosition.z < texture(shadowMap, (shadowPosition.xy + vec2(0,-texel.y))).z + bias) {
+		shadowFinal += 1;
 	}
+	if (shadowPosition.z < texture(shadowMap, (shadowPosition.xy + vec2(-texel.x, 0))).z + bias) {
+		shadowFinal += 1;
+	}
+	if (shadowPosition.z < texture(shadowMap, (shadowPosition.xy)).z + bias) {
+		shadowFinal += 1;
+	}
+	if (shadowPosition.z < texture(shadowMap, (shadowPosition.xy + vec2(texel.x,0))).z + bias) {
+		shadowFinal += 1;
+	}
+	if (shadowPosition.z < texture(shadowMap, (shadowPosition.xy + vec2(0,texel.y))).z + bias) {
+		shadowFinal += 1;
+	}
+	if (shadowFinal > 0) {
+		shadowFinal = shadowFinal / 5;
+		d = d * shadowFinal;
+	} else {
+		 d = 0;
+	}
+	
+//Light Calc
 	if (d > 0) {
 		//Specular Calculation
 		vec3 specular = texture(specularMap, fTexCoord).xyz;
@@ -63,11 +92,18 @@ void main() {
 		
 		//Output
 		lightTexture = (lightDiffuse * d);
-		specularTexture = (((specular * lightDiffuse) /* 0.1*/) * is);
+		specularTexture = (lightDiffuse * is);
 	}
 	if (d <= 0) {
+	//Third point Light
+//		if ((normal.x < -0.95 || normal.x > 0.95 || normal.y < -0.95 || normal.y > 0.95) && shadowFinal > 0) {
+//			lightTexture = vec3(0.2);
+//		} else {
+//			lightTexture = vec3(0);
+//		}
+		
 		lightTexture = vec3(0);
 		specularTexture = vec3(0);
 	}
-	//lightTexture = vec3(shadowPosition.z);
+	//lightTexture = vec3(d);
 }
