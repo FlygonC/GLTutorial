@@ -209,7 +209,7 @@ void Renderer::updateEmitter(ParticleEmitterEx* in, unsigned int id)
 	emitterList[id] = *in;
 }
 
-void Renderer::clearPLight(unsigned int id)
+void Renderer::clearEmitter(unsigned int id)
 {
 	emitterList[id].inUse = false;
 }
@@ -265,6 +265,12 @@ void Renderer::init()
 	{
 		PointLightIn obj;
 		pointLightList.push_back(obj);
+	}
+	emitterList.reserve(5);
+	for (unsigned i = 0; i < 5; i++)
+	{
+		ParticleEmitterIn obj;
+		emitterList.push_back(obj);
 	}
 	
 	auto &a = AssetManager::instance();
@@ -334,18 +340,11 @@ void RenderEngine::Renderer::setCamera(Camera c)
 }
 
 //RENDERING #$#$#$#$#$#$#$#$#$#$#$#
-void Renderer::render()
+void Renderer::render(float deltaTime)
 {
 	//gpass ########################
 	gPass.prep();
-	/*for each (RenderObjectIn i in objectList)
-	{
-		if (i.inUse && i.visible)
-		{
-			gPass.draw(i, camera);
-		}
-	}*/
-	//glUseProgram(AssetManager::instance().get<ASSET::SHADER>(shader.name.c_str()));
+	
 	bindShader(AssetManager::instance().get<ASSET::SHADER>("GPassShader"));
 
 	setUniform("ProjectionView", UNIFORM::MAT4, glm::value_ptr(camera.getProjectionView()));
@@ -372,6 +371,44 @@ void Renderer::render()
 
 			glBindVertexArray(AssetManager::instance().get<ASSET::VAO>(i.mesh.name.c_str()));
 			glDrawElements(GL_TRIANGLES, AssetManager::instance().get<ASSET::SIZE>(i.mesh.name.c_str()), GL_UNSIGNED_INT, 0);
+		}
+	}
+	// PARTICLES
+	for (unsigned i = 0; i < 5; i++)
+	{
+		if (emitterList[i].inUse)
+		{
+			emitterList[i].update(deltaTime);
+			for (unsigned j = 0; j < 50; j++)
+			{
+				if (emitterList[i].particles[j].live)
+				{
+					setUniform("Model", UNIFORM::MAT4, glm::value_ptr(emitterList[i].particles[j].trans.get()));
+
+					float zero = 0;
+					setUniform("specPower", UNIFORM::FLO1, &zero);
+
+					setUniform("diffuseTint", UNIFORM::FLO3, glm::value_ptr(emitterList[i].particles[j].color));
+					setUniform("specularTint", UNIFORM::FLO3, glm::value_ptr(glm::vec3(0)));
+					setUniform("glowTint", UNIFORM::FLO3, glm::value_ptr(glm::vec3(0)));
+
+					Asset<ASSET::TEXTURE> d;
+					d = "Black";
+					setUniform("diffuseMap", UNIFORM::TEX2, &d, 0);
+					Asset<ASSET::TEXTURE> n;
+					n = "Flat";
+					setUniform("normalMap", UNIFORM::TEX2, &n, 1);
+					Asset<ASSET::TEXTURE> s;
+					s = "Black";
+					setUniform("specularMap", UNIFORM::TEX2, &s, 2);
+					Asset<ASSET::TEXTURE> g;
+					g = "Black";
+					setUniform("glowMap", UNIFORM::TEX2, &g, 3);
+
+					glBindVertexArray(AssetManager::instance().get<ASSET::VAO>("Cube"));
+					glDrawElements(GL_TRIANGLES, AssetManager::instance().get<ASSET::SIZE>("Cube"), GL_UNSIGNED_INT, 0);
+				}
+			}
 		}
 	}
 

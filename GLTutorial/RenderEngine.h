@@ -109,7 +109,7 @@ namespace RenderEngine
 	struct Range
 	{
 		T start, end;
-		operator=(T other)
+		void operator=(T other)
 		{
 			start = other;
 			end = other;
@@ -121,19 +121,22 @@ namespace RenderEngine
 		Material mat;
 		glm::vec3 direction = glm::vec3(0);
 		float velocity;
+		glm::vec3 color;
 		float lifeTime = 0;
+		bool live = false;
 	};
 	class ParticleEmitterEx
 	{
 		unsigned int referenceID;
 		//Particle particles[50];
 	public:
-		Range<Transform> transform;
+		glm::vec3 source = glm::vec3(0);
 		Range<float> velocity;
 		Range<glm::vec3> direction;
+		Range<glm::vec3> size;
 		Range<glm::vec3> color;
-		float maxLife;
-		float emittionRate;
+		float maxLife = 1;
+		float emittionRate = 0.02f;
 
 		Asset<ASSET::VAO> mesh;
 
@@ -201,11 +204,12 @@ namespace RenderEngine
 		public:
 			Particle particles[50];
 
-			Range<Transform> transform;
+			glm::vec3 source;
 			Range<float> velocity;
 			Range<glm::vec3> direction;
+			Range<glm::vec3> size;
 			Range<glm::vec3> color;
-			float maxLife;
+			float maxLife = 1;
 			float emittionRate;
 
 			Asset<ASSET::VAO> mesh;
@@ -214,17 +218,66 @@ namespace RenderEngine
 
 			void createPart()
 			{
-				particles[currentPart].trans = transform.start;
+				particles[currentPart].trans.position = source;
 				particles[currentPart].velocity = velocity.start;
-				particles[currentPart].direction = glm::lerp(direction.start, direction.end, 1.f);
+
+				float random1 = (rand() % 100);
+				float random2 = (random1 - 1) / 100;
+				particles[currentPart].direction.x = glm::lerp(-1.f, 1.f, random2);
+				random1 = (rand() % 100);
+				random2 = (random1 - 1) / 100;
+				particles[currentPart].direction.y = glm::lerp(-1.f, 1.f, random2);
+				random1 = (rand() % 100);
+				random2 = (random1 - 1) / 100;
+				particles[currentPart].direction.z = glm::lerp(-1.f, 1.f, random2);
+
+				particles[currentPart].color = color.start;
+				particles[currentPart].lifeTime = 0;
+				particles[currentPart].live = true;
+
+				currentPart++;
+				if (currentPart >= 50)
+				{
+					currentPart = 0;
+				}
 			}
-			void update(float deltaTime);
+			void update(float deltaTime)
+			{
+				lastEmit += deltaTime;
+				while (lastEmit >= emittionRate)
+				{
+					createPart();
+					lastEmit -= emittionRate;
+				}
+
+				for (unsigned i = 0; i < 50; i++)
+				{
+					if (particles[i].live)
+					{
+						float lerpValue = particles[i].lifeTime / maxLife;
+
+						particles[i].velocity = glm::lerp(velocity.start, velocity.end, lerpValue);
+						particles[i].trans.position += particles[i].direction * particles[i].velocity * deltaTime;
+
+						particles[i].trans.scale = glm::lerp(size.start, size.end, lerpValue);
+
+						particles[i].color = glm::lerp(color.start, color.end, lerpValue);
+
+						particles[i].lifeTime += deltaTime;
+						if (particles[i].lifeTime >= maxLife)
+						{
+							particles[i].live = false;
+						}
+					}
+				}
+			}
 
 			ParticleEmitterIn operator=(ParticleEmitterEx other)
 			{
-				this->transform = other.transform;
+				this->source = other.source;
 				this->velocity = other.velocity;
 				this->direction = other.direction;
+				this->size = other.size;
 				this->color = other.color;
 				this->maxLife = other.maxLife;
 				this->emittionRate = other.emittionRate;
@@ -235,6 +288,7 @@ namespace RenderEngine
 			}
 		private:
 			int currentPart = 0;
+			float lastEmit = 0;
 		};
 
 		class GPassRender : public RenderPass
@@ -322,6 +376,6 @@ namespace RenderEngine
 		
 		void setCamera(Camera c);
 
-		void render();
+		void render(float deltaTime);
 	};
 }

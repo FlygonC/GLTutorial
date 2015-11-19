@@ -8,6 +8,8 @@
 //#include "AssetLibrary.h"
 #include "TestApplication.h"
 
+#include <time.h>
+
 int main()
 {
 /*	Application *App = new AppDeferredStart();
@@ -25,6 +27,7 @@ int main()
 	App->kill();
 	delete App;
 	*/
+	srand(time(NULL));
 
 	using namespace AssetLibrary;
 

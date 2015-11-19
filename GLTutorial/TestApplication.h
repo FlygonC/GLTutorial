@@ -23,4 +23,6 @@ class TestApplication : public AssetLibrary::Application
 	RenderEngine::PointLightEx pLight2;
 	RenderEngine::PointLightEx pLight3;
 	RenderEngine::PointLightEx pLight4;
+
+	RenderEngine::ParticleEmitterEx emitter1;
 };

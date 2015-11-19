@@ -36,7 +36,7 @@ namespace AssetLibrary
 			onPlay();
 			do { 
 				step();
-				RenderEngine::Renderer::instance().render();
+				RenderEngine::Renderer::instance().render(deltaTime);
 			} 
 			while (Window::instance().getShouldClose() == false);
 		}

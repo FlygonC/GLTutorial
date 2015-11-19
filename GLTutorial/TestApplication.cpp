@@ -65,6 +65,15 @@ void TestApplication::onInit()
 	//pLight4.color = glm::vec3(1.f, 1.f, 1.f);
 	pLight4.position = glm::vec3(0.f, -2.5f, 0.f);
 	pLight4.radius = 5;
+
+	emitter1.source = glm::vec3(0, 5, 0);
+	emitter1.velocity = 1;
+	emitter1.direction.start = glm::vec3(-1);
+	emitter1.direction.end = glm::vec3(1);
+	emitter1.size.start = glm::vec3(0.3f);
+	emitter1.size.end = glm::vec3(0);
+	emitter1.color.start = glm::vec3(1.f, 1.f, 0.1f);
+	emitter1.color.end = glm::vec3(1.f, 0.1f, 0.1f);
 }
 
 void TestApplication::onKill()
@@ -87,6 +96,8 @@ void TestApplication::onPlay()
 	//pLight2.instantiate();
 	//pLight3.instantiate();
 	//pLight4.instantiate();
+
+	emitter1.instantiate();
 }
 
 void TestApplication::onStep(float dTime)
@@ -115,4 +126,6 @@ void TestApplication::onStep(float dTime)
 	//pLight2.update();
 	//pLight3.update();
 	//pLight4.update();
+
+	emitter1.update();
 }
