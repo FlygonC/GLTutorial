@@ -108,26 +108,48 @@ namespace RenderEngine
 	template<typename T>
 	struct Range
 	{
+		typename type = T;
 		T start, end;
 		void operator=(T other)
 		{
 			start = other;
 			end = other;
 		}
+		void func()
+		{
+			if (type == float)
+			{
+
+			}
+		}
 	};
 	struct Particle
 	{
-		Transform trans;
+		float position;
+		float velocity;
+		float size;
+		float lifeTime, maxLife;
+		/*Transform trans;
 		Material mat;
 		glm::vec3 direction = glm::vec3(0);
 		float velocity;
 		glm::vec3 color;
 		float lifeTime = 0;
-		bool live = false;
+		bool live = false;*/
+	};
+	struct ParticleEmitterData
+	{
+		Range<float> velocity;
+		Range<glm::vec3> direction;
+		Range<glm::vec3> size;
+		Range<float> maxLife;
+		Range<float> emittionRate;
+		//void func() {}
 	};
 	class ParticleEmitterEx
 	{
-		unsigned int referenceID;
+
+/*		unsigned int referenceID;
 		//Particle particles[50];
 	public:
 		glm::vec3 source = glm::vec3(0);
@@ -143,7 +165,7 @@ namespace RenderEngine
 		void instantiate();
 		void update();
 		void destroy();
-		unsigned int getReferenceID();
+		unsigned int getReferenceID();*/
 	};
 	
 	class Renderer
@@ -201,7 +223,8 @@ namespace RenderEngine
 
 		class ParticleEmitterIn
 		{
-		public:
+
+/*		public:
 			Particle particles[50];
 
 			glm::vec3 source;
@@ -241,7 +264,7 @@ namespace RenderEngine
 					currentPart = 0;
 				}
 			}
-			void update(float deltaTime)
+			void update(float deltaTime, glm::mat4 cameraView)
 			{
 				lastEmit += deltaTime;
 				while (lastEmit >= emittionRate)
@@ -252,8 +275,8 @@ namespace RenderEngine
 
 				for (unsigned i = 0; i < 50; i++)
 				{
-					if (particles[i].live)
-					{
+				//	if (particles[i].live)
+				//	{
 						float lerpValue = particles[i].lifeTime / maxLife;
 
 						particles[i].velocity = glm::lerp(velocity.start, velocity.end, lerpValue);
@@ -264,11 +287,19 @@ namespace RenderEngine
 						particles[i].color = glm::lerp(color.start, color.end, lerpValue);
 
 						particles[i].lifeTime += deltaTime;
-						if (particles[i].lifeTime >= maxLife)
-						{
-							particles[i].live = false;
-						}
-					}
+
+						particles[i].live = particles[i].lifeTime < maxLife;
+
+
+						//glm::vec3 cameraRight = glm::vec3(cameraView[0][0], cameraView[1][0], cameraView[2][0]);
+						//glm::vec3 cameraUp = glm::vec3(cameraView[0][1], cameraView[1][1], cameraView[2][1]);
+						
+
+					 //  if (particles[i].lifeTime > maxLife)
+						//{
+						//	particles[i].live = false;
+						//}
+					//}
 				}
 			}
 
@@ -288,7 +319,7 @@ namespace RenderEngine
 			}
 		private:
 			int currentPart = 0;
-			float lastEmit = 0;
+			float lastEmit = 0;*/
 		};
 
 		class GPassRender : public RenderPass

@@ -56,6 +56,13 @@ void Renderer::clearObject(unsigned int id)
 
 
 
+
+
+
+
+
+
+
 // Directional Light ###################
 void DirectionalLightEx::instantiate()
 {
@@ -106,6 +113,13 @@ void Renderer::clearDLight(unsigned int id)
 {
 	directionalLightList[id].inUse = false;
 }
+
+
+
+
+
+
+
 
 
 
@@ -163,6 +177,14 @@ void Renderer::clearPLight(unsigned int id)
 
 
 
+
+
+
+
+
+
+
+
 // Particle Emitter ################
 void ParticleEmitterEx::instantiate()
 {
@@ -213,6 +235,14 @@ void Renderer::clearEmitter(unsigned int id)
 {
 	emitterList[id].inUse = false;
 }
+
+
+
+
+
+
+
+
 
 
 
@@ -378,35 +408,33 @@ void Renderer::render(float deltaTime)
 	{
 		if (emitterList[i].inUse)
 		{
-			emitterList[i].update(deltaTime);
+			emitterList[i].update(deltaTime, camera.getView());
+			glBindVertexArray(AssetManager::instance().get<ASSET::VAO>("Quad"));
+			float zero = 0;
+			setUniform("specPower", UNIFORM::FLO1, &zero);
+			setUniform("specularTint", UNIFORM::FLO3, glm::value_ptr(glm::vec3(0)));
+			setUniform("glowTint", UNIFORM::FLO3, glm::value_ptr(glm::vec3(0)));
+
+			Asset<ASSET::TEXTURE> d;
+			d = "Black";
+			setUniform("diffuseMap", UNIFORM::TEX2, &d, 0);
+			Asset<ASSET::TEXTURE> n;
+			n = "Flat";
+			setUniform("normalMap", UNIFORM::TEX2, &n, 1);
+			Asset<ASSET::TEXTURE> s;
+			s = "Black";
+			setUniform("specularMap", UNIFORM::TEX2, &s, 2);
+			Asset<ASSET::TEXTURE> g;
+			g = "Black";
+			setUniform("glowMap", UNIFORM::TEX2, &g, 3);
+
 			for (unsigned j = 0; j < 50; j++)
 			{
 				if (emitterList[i].particles[j].live)
 				{
 					setUniform("Model", UNIFORM::MAT4, glm::value_ptr(emitterList[i].particles[j].trans.get()));
-
-					float zero = 0;
-					setUniform("specPower", UNIFORM::FLO1, &zero);
-
-					setUniform("diffuseTint", UNIFORM::FLO3, glm::value_ptr(emitterList[i].particles[j].color));
-					setUniform("specularTint", UNIFORM::FLO3, glm::value_ptr(glm::vec3(0)));
-					setUniform("glowTint", UNIFORM::FLO3, glm::value_ptr(glm::vec3(0)));
-
-					Asset<ASSET::TEXTURE> d;
-					d = "Black";
-					setUniform("diffuseMap", UNIFORM::TEX2, &d, 0);
-					Asset<ASSET::TEXTURE> n;
-					n = "Flat";
-					setUniform("normalMap", UNIFORM::TEX2, &n, 1);
-					Asset<ASSET::TEXTURE> s;
-					s = "Black";
-					setUniform("specularMap", UNIFORM::TEX2, &s, 2);
-					Asset<ASSET::TEXTURE> g;
-					g = "Black";
-					setUniform("glowMap", UNIFORM::TEX2, &g, 3);
-
-					glBindVertexArray(AssetManager::instance().get<ASSET::VAO>("Cube"));
-					glDrawElements(GL_TRIANGLES, AssetManager::instance().get<ASSET::SIZE>("Cube"), GL_UNSIGNED_INT, 0);
+					setUniform("diffuseTint", UNIFORM::FLO3, glm::value_ptr(emitterList[i].particles[j].color));					
+					glDrawElements(GL_TRIANGLES, AssetManager::instance().get<ASSET::SIZE>("Quad"), GL_UNSIGNED_INT, 0);
 				}
 			}
 		}
