@@ -14,7 +14,7 @@ void TestApplication::onInit()
 	camera.setSpeed(5, 0.1f);
 	//camera.setPosition(glm::vec3(0, 0, -4));
 
-	cube.mesh = "SoulSpear";
+/*	cube.mesh = "SoulSpear";
 	cube.material.diffuseTexture = "SoulSpearDiffuse";
 	cube.material.glowTexture = "Black";
 	//cube.material.glowTint = glm::vec3(0.1f, 0.5f, 0.5f);
@@ -74,59 +74,20 @@ void TestApplication::onInit()
 	emitter1.size.start = glm::vec3(0.3f);
 	emitter1.size.end = glm::vec3(0);
 	emitter1.color.start = glm::vec3(0.9f, 0.9f, 1.f);
-	emitter1.color.end = glm::vec3(0.1f, 0.1f, 1.f);
+	emitter1.color.end = glm::vec3(0.1f, 0.1f, 1.f);*/
 }
 
 void TestApplication::onKill()
 {
-	cube.destroy();
-	dLight.destroy();
-	pLight.destroy();
+	
 }
 
 void TestApplication::onPlay()
 {
-	cube.instantiate();
-	cube2.instantiate();
-	ground.instantiate();
-
-	//dLight.instantiate();
-	dLight2.instantiate();
-
-	//pLight.instantiate();
-	//pLight2.instantiate();
-	//pLight3.instantiate();
-	//pLight4.instantiate();
-
-	emitter1.instantiate();
+	
 }
 
 void TestApplication::onStep(float dTime)
 {
-	camera.update(dTime);
-	//camera.setPosition(glm::vec3(0, 0, -4));
-	RenderEngine::Renderer::instance().setCamera(camera);
-
-	float time = Window::instance().getTime();
-	cube.transform.rotation = glm::vec3(0, -time, 0);
-	//cube.transform.scale = glm::vec3(sin(time));
-	//cube.transform.position.z = 0;
-	cube.update();
-
-	cube2.update();
-
-	ground.update();
-
-	//dLight.direction = glm::vec3(sin(time), 1.0f, cos(time));
-	//dLight.direction = glm::vec3(0.0f, 1.0f, 0.5f);
-	//dLight.update();
-
-	dLight2.update();
-
-	//pLight.update();
-	//pLight2.update();
-	//pLight3.update();
-	//pLight4.update();
-
-	emitter1.update();
+	
 }

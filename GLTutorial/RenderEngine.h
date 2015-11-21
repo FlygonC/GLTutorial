@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <algorithm>
 
 #include "Render.h"
 #include "AssetManager.h"
@@ -13,6 +14,10 @@ namespace RenderEngine
 	namespace UNIFORM
 	{
 		enum TYPE { NONE = 0, FLO1, FLO2, FLO3, FLO4, MAT4, INT1, TEX2, eSIZE };
+	}
+	namespace DATATYPE
+	{
+		enum TYPE { GEOMETRY = 0, DIRECTIONALLIGHT, POINTLIGHT, PARTICLEEMITTER, EMPTY = 100 };
 	}
 
 	struct Transform
@@ -58,53 +63,6 @@ namespace RenderEngine
 			return *this;
 		}
 	};
-
-	struct RenderObjectEx
-	{
-	private:
-		unsigned int referenceID;
-	public:
-		Asset<ASSET::VAO> mesh;
-		Transform transform;
-		Material material;
-		bool visible = true;
-
-		void instantiate();
-		void update();
-		void destroy();
-		unsigned int getReferenceID();
-	};
-	struct DirectionalLightEx
-	{
-	private:
-		unsigned int referenceID;
-	public:
-		glm::vec3 color = glm::vec3(0);
-		glm::vec3 direction = glm::vec3(1);
-		bool visible = true;
-
-		void instantiate();
-		void update();
-		void destroy();
-		unsigned int getReferenceID();
-	};
-	struct PointLightEx
-	{
-	private:
-		unsigned int referenceID;
-	public:
-		glm::vec3 color = glm::vec3(0);
-		glm::vec3 position = glm::vec3(0);
-		float radius = 1;
-		bool visible = true;
-
-		void instantiate();
-		void update();
-		void destroy();
-		unsigned int getReferenceID();
-	};
-	
-
 	template<typename T>
 	struct Range
 	{
@@ -123,6 +81,34 @@ namespace RenderEngine
 			}
 		}
 	};
+
+	class DataContainer
+	{
+	public:
+		glm::vec3 position = glm::vec3(0);
+		bool visible = true;
+	};
+	class GeometryData : public DataContainer
+	{
+	public:
+		Asset<ASSET::VAO> mesh;
+		Transform transform;
+		Material material;
+	};
+	class DirectionalLightData : public DataContainer
+	{
+	public:
+		glm::vec3 color = glm::vec3(0);
+		glm::vec3 direction = glm::vec3(1);
+	};
+	class PointLightData : public DataContainer
+	{
+	public:
+		glm::vec3 color = glm::vec3(0);
+		glm::vec3 position = glm::vec3(0);
+		float radius = 1;
+	};
+	
 	struct Particle
 	{
 		float position;
@@ -137,40 +123,36 @@ namespace RenderEngine
 		float lifeTime = 0;
 		bool live = false;*/
 	};
-	struct ParticleEmitterData
+	class ParticleEmitterData : public DataContainer
 	{
 		Range<float> velocity;
 		Range<glm::vec3> direction;
 		Range<glm::vec3> size;
 		Range<float> maxLife;
 		Range<float> emittionRate;
-		//void func() {}
 	};
-	class ParticleEmitterEx
+	
+
+
+	//template<DataContainer T>
+	class RenderObjectEx
 	{
+		DATATYPE::TYPE dataType;
+		unsigned int tagNumber;
 
-/*		unsigned int referenceID;
-		//Particle particles[50];
-	public:
-		glm::vec3 source = glm::vec3(0);
-		Range<float> velocity;
-		Range<glm::vec3> direction;
-		Range<glm::vec3> size;
-		Range<glm::vec3> color;
-		float maxLife = 1;
-		float emittionRate = 0.02f;
+		RenderObjectEx() {}
+		~RenderObjectEx();
+	public :
+		DataContainer data;
 
-		Asset<ASSET::VAO> mesh;
-
-		void instantiate();
+		RenderObjectEx(DATATYPE::TYPE type);
 		void update();
-		void destroy();
-		unsigned int getReferenceID();*/
+		void destroy(unsigned int tag);
 	};
 	
 	class Renderer
 	{
-		struct RenderObjectIn
+/*		struct RenderObjectIn
 		{
 			Asset<ASSET::VAO> mesh;
 			Transform transform;
@@ -224,102 +206,29 @@ namespace RenderEngine
 		class ParticleEmitterIn
 		{
 
-/*		public:
-			Particle particles[50];
+		};
+*/
 
-			glm::vec3 source;
-			Range<float> velocity;
-			Range<glm::vec3> direction;
-			Range<glm::vec3> size;
-			Range<glm::vec3> color;
-			float maxLife = 1;
-			float emittionRate;
+		//template<DataContainer T>
+		class RenderObjectIn
+		{
+		public:
+			RenderObjectIn() {}
 
-			Asset<ASSET::VAO> mesh;
-
+			DATATYPE::TYPE dataType = DATATYPE::EMPTY;
+			unsigned int tagNumber;
 			bool inUse = false;
 
-			void createPart()
+			//DataContainer data;
+
+			void clear()
 			{
-				particles[currentPart].trans.position = source;
-				particles[currentPart].velocity = velocity.start;
-
-				float random1 = (rand() % 100);
-				float random2 = (random1 - 1) / 100;
-				particles[currentPart].direction.x = glm::lerp(-1.f, 1.f, random2);
-				random1 = (rand() % 100);
-				random2 = (random1 - 1) / 100;
-				particles[currentPart].direction.y = glm::lerp(-1.f, 1.f, random2);
-				random1 = (rand() % 100);
-				random2 = (random1 - 1) / 100;
-				particles[currentPart].direction.z = glm::lerp(-1.f, 1.f, random2);
-
-				particles[currentPart].color = color.start;
-				particles[currentPart].lifeTime = 0;
-				particles[currentPart].live = true;
-
-				currentPart++;
-				if (currentPart >= 50)
-				{
-					currentPart = 0;
-				}
+				dataType = DATATYPE::EMPTY;
+				tagNumber = NULL;
+				inUse = false;
+				//delete data;
+				//data = nullptr;
 			}
-			void update(float deltaTime, glm::mat4 cameraView)
-			{
-				lastEmit += deltaTime;
-				while (lastEmit >= emittionRate)
-				{
-					createPart();
-					lastEmit -= emittionRate;
-				}
-
-				for (unsigned i = 0; i < 50; i++)
-				{
-				//	if (particles[i].live)
-				//	{
-						float lerpValue = particles[i].lifeTime / maxLife;
-
-						particles[i].velocity = glm::lerp(velocity.start, velocity.end, lerpValue);
-						particles[i].trans.position += particles[i].direction * particles[i].velocity * deltaTime;
-
-						particles[i].trans.scale = glm::lerp(size.start, size.end, lerpValue);
-
-						particles[i].color = glm::lerp(color.start, color.end, lerpValue);
-
-						particles[i].lifeTime += deltaTime;
-
-						particles[i].live = particles[i].lifeTime < maxLife;
-
-
-						//glm::vec3 cameraRight = glm::vec3(cameraView[0][0], cameraView[1][0], cameraView[2][0]);
-						//glm::vec3 cameraUp = glm::vec3(cameraView[0][1], cameraView[1][1], cameraView[2][1]);
-						
-
-					 //  if (particles[i].lifeTime > maxLife)
-						//{
-						//	particles[i].live = false;
-						//}
-					//}
-				}
-			}
-
-			ParticleEmitterIn operator=(ParticleEmitterEx other)
-			{
-				this->source = other.source;
-				this->velocity = other.velocity;
-				this->direction = other.direction;
-				this->size = other.size;
-				this->color = other.color;
-				this->maxLife = other.maxLife;
-				this->emittionRate = other.emittionRate;
-
-				this->mesh = other.mesh;
-
-				return *this;
-			}
-		private:
-			int currentPart = 0;
-			float lastEmit = 0;*/
 		};
 
 		class GPassRender : public RenderPass
@@ -329,7 +238,6 @@ namespace RenderEngine
 			void post();
 			//void draw(RenderObjectIn ob, Camera c);
 		};
-		
 		class DLightPassRender : public RenderPass
 		{
 		public:
@@ -352,10 +260,12 @@ namespace RenderEngine
 			//void draw();
 		};
 
+		unsigned int typeCounts[4];
 		std::vector<RenderObjectIn> objectList = std::vector<RenderObjectIn>();
-		std::vector<DirectionalLightIn> directionalLightList = std::vector<DirectionalLightIn>();
-		std::vector<PointLightIn> pointLightList = std::vector<PointLightIn>();
-		std::vector<ParticleEmitterIn> emitterList = std::vector<ParticleEmitterIn>();
+		//std::vector<RenderObjectIn> objectList = std::vector<RenderObjectIn>();
+		//std::vector<DirectionalLightIn> directionalLightList = std::vector<DirectionalLightIn>();
+		//std::vector<PointLightIn> pointLightList = std::vector<PointLightIn>();
+		//std::vector<ParticleEmitterIn> emitterList = std::vector<ParticleEmitterIn>();
 
 		GPassRender gPass;
 		DLightPassRender dLight;
@@ -364,20 +274,18 @@ namespace RenderEngine
 
 		unsigned int boundShader;
 		unsigned int boundFrameBuffer;
+		unsigned int objectCount = 0;
 
 		glm::vec3 ambientLight = glm::vec3(0.5f);
 		Camera camera;
 
 		Renderer() {}
 
-		unsigned int newObject();
-		unsigned int newDLight();
-		unsigned int newPLight();
-		unsigned int newEmitter();
-
 		//void bindFBO(unsigned int fbo);
 		void bindShader(unsigned int shader);
 		bool setUniform(const char* name, UNIFORM::TYPE type, const void* value, unsigned count = 1, bool normalize = false);
+
+		static bool compare(const DATATYPE::TYPE &l, const DATATYPE::TYPE &r);
 
 	public:
 		static Renderer &instance()
@@ -389,7 +297,10 @@ namespace RenderEngine
 		void init();
 		void kill();
 
-		unsigned int createObject(RenderObjectEx* in);
+		unsigned int newObject(DATATYPE::TYPE type, DataContainer in);
+		void updateObject(unsigned int tag, DataContainer in);
+		void clearObject(unsigned int tag);
+/*		unsigned int createObject(RenderObjectEx* in);
 		void updateObject(RenderObjectEx* in, unsigned int id);
 		void clearObject(unsigned int id);
 		
@@ -404,7 +315,7 @@ namespace RenderEngine
 		unsigned int createEmitter(ParticleEmitterEx* in);
 		void updateEmitter(ParticleEmitterEx* in, unsigned int id);
 		void clearEmitter(unsigned int id);
-		
+*/		
 		void setCamera(Camera c);
 
 		void render(float deltaTime);

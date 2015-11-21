@@ -2,242 +2,85 @@
 
 using namespace RenderEngine;
 
-// Render Object ###################
-void RenderObjectEx::instantiate()
+RenderObjectEx::RenderObjectEx(DATATYPE::TYPE type)
 {
-	referenceID = Renderer::instance().createObject(this);
+	dataType = type;
+	switch (type)
+	{
+	case DATATYPE::GEOMETRY:
+		//data = new GeometryData();
+		break;
+	case DATATYPE::DIRECTIONALLIGHT:
+		//data = new DirectionalLightData();
+		break;
+	case DATATYPE::POINTLIGHT:
+		//data = new PointLightData();
+		break;
+	case DATATYPE::PARTICLEEMITTER:
+		//data = new ParticleEmitterData();
+		break;
+	}
+	tagNumber = Renderer::instance().newObject(type, data);
 }
-
+RenderObjectEx::~RenderObjectEx()
+{
+	Renderer::instance().clearObject(tagNumber);
+	//delete data;
+}
 void RenderObjectEx::update()
 {
-	Renderer::instance().updateObject(this, referenceID);
+	Renderer::instance().updateObject(tagNumber, data);
+}
+void RenderObjectEx::destroy(unsigned int tag)
+{
+
 }
 
-void RenderObjectEx::destroy()
+bool Renderer::compare(const DATATYPE::TYPE &l, const DATATYPE::TYPE &r)
 {
-	Renderer::instance().clearObject(referenceID);
+	return l < r;
 }
+unsigned int Renderer::newObject(DATATYPE::TYPE type, DataContainer in)
+{
+	unsigned int nextEmpty = typeCounts[0] + typeCounts[1] + typeCounts[2] + typeCounts[3];
 
-unsigned int RenderObjectEx::getReferenceID()
-{
-	return referenceID;
+	//RenderObjectIn newObject;
+	//*newObject.data = *in;
+	//newObject.dataType = type;
+	//newObject.inUse = true;
+
+	//newObject.tagNumber = objectCount;
+	objectCount++;
+
+	//objectList[nextEmpty] = newObject;
+	std::sort(objectList.begin(), objectList.end(), compare);
+
+	typeCounts[type]++;
+	return objectCount - 1;;
 }
-//internal
-unsigned int Renderer::newObject()
+void Renderer::updateObject(unsigned int tag, DataContainer in)
 {
-	//Search for an object in vector tagged Unused
 	for (unsigned i = 0; i < objectList.size(); i++)
 	{
-		if (objectList[i].inUse == false)
+		if (objectList[i].tagNumber == tag)
 		{
-			return i;
+			*objectList[i].data = *in;
+			return;
 		}
 	}
-	return objectList.size() - 1;
 }
-unsigned int Renderer::createObject(RenderObjectEx* in)
+void Renderer::clearObject(unsigned int tag)
 {
-	unsigned int slot = newObject();
-	objectList[slot] = *in;
-	objectList[slot].inUse = true;
-	return slot;
-}
-
-void Renderer::updateObject(RenderObjectEx* in, unsigned int id)
-{
-	objectList[id] = *in;
-}
-
-void Renderer::clearObject(unsigned int id)
-{
-	objectList[id].inUse = false;
-}
-
-
-
-
-
-
-
-
-
-
-
-// Directional Light ###################
-void DirectionalLightEx::instantiate()
-{
-	referenceID = Renderer::instance().createDLight(this);
-}
-
-void DirectionalLightEx::update()
-{
-	Renderer::instance().updateDLight(this, referenceID);
-}
-
-void DirectionalLightEx::destroy()
-{
-	Renderer::instance().clearDLight(referenceID);
-}
-
-unsigned int DirectionalLightEx::getReferenceID()
-{
-	return referenceID;
-}
-//internal
-unsigned int Renderer::newDLight()
-{
-	//Search for an object in vector tagged Unused
-	for (unsigned i = 0; i < directionalLightList.size(); i++)
+	for (unsigned i = 0; i < objectList.size(); i++)
 	{
-		if (directionalLightList[i].inUse == false)
+		if (objectList[i].tagNumber == tag)
 		{
-			return i;
+			typeCounts[objectList[i].dataType]--;
+			objectList[i].clear();
+			return;
 		}
 	}
-	return directionalLightList.size() - 1;
 }
-unsigned int Renderer::createDLight(DirectionalLightEx* in)
-{
-	unsigned int slot = newDLight();
-	directionalLightList[slot] = *in;
-	directionalLightList[slot].inUse = true;
-	return slot;
-}
-
-void Renderer::updateDLight(DirectionalLightEx* in, unsigned int id)
-{
-	directionalLightList[id] = *in;
-}
-
-void Renderer::clearDLight(unsigned int id)
-{
-	directionalLightList[id].inUse = false;
-}
-
-
-
-
-
-
-
-
-
-
-
-// Point Light ################
-void PointLightEx::instantiate()
-{
-	referenceID = Renderer::instance().createPLight(this);
-}
-
-void PointLightEx::update()
-{
-	Renderer::instance().updatePLight(this, referenceID);
-}
-
-void PointLightEx::destroy()
-{
-	Renderer::instance().clearPLight(referenceID);
-}
-
-unsigned int PointLightEx::getReferenceID()
-{
-	return referenceID;
-}
-//internal
-unsigned int Renderer::newPLight()
-{
-	//Search for an object in vector tagged Unused
-	for (unsigned i = 0; i < pointLightList.size(); i++)
-	{
-		if (pointLightList[i].inUse == false)
-		{
-			return i;
-		}
-	}
-	return pointLightList.size() - 1;
-}
-unsigned int Renderer::createPLight(PointLightEx* in)
-{
-	unsigned int slot = newPLight();
-	pointLightList[slot] = *in;
-	pointLightList[slot].inUse = true;
-	return slot;
-}
-
-void Renderer::updatePLight(PointLightEx* in, unsigned int id)
-{
-	pointLightList[id] = *in;
-}
-
-void Renderer::clearPLight(unsigned int id)
-{
-	pointLightList[id].inUse = false;
-}
-
-
-
-
-
-
-
-
-
-
-
-// Particle Emitter ################
-void ParticleEmitterEx::instantiate()
-{
-	referenceID = Renderer::instance().createEmitter(this);
-}
-
-void ParticleEmitterEx::update()
-{
-	Renderer::instance().updateEmitter(this, referenceID);
-}
-
-void ParticleEmitterEx::destroy()
-{
-	Renderer::instance().clearEmitter(referenceID);
-}
-
-unsigned int ParticleEmitterEx::getReferenceID()
-{
-	return referenceID;
-}
-//internal
-unsigned int Renderer::newEmitter()
-{
-	//Search for an object in vector tagged Unused
-	for (unsigned i = 0; i < emitterList.size(); i++)
-	{
-		if (emitterList[i].inUse == false)
-		{
-			return i;
-		}
-	}
-	return emitterList.size() - 1;
-}
-unsigned int Renderer::createEmitter(ParticleEmitterEx* in)
-{
-	unsigned int slot = newEmitter();
-	emitterList[slot] = *in;
-	emitterList[slot].inUse = true;
-	return slot;
-}
-
-void Renderer::updateEmitter(ParticleEmitterEx* in, unsigned int id)
-{
-	emitterList[id] = *in;
-}
-
-void Renderer::clearEmitter(unsigned int id)
-{
-	emitterList[id].inUse = false;
-}
-
-
-
 
 
 
@@ -284,7 +127,7 @@ void Renderer::init()
 		RenderObjectIn obj;
 		objectList.push_back(obj);
 	}
-	directionalLightList.reserve(100);
+/*	directionalLightList.reserve(100);
 	for (unsigned i = 0; i < 100; i++)
 	{
 		DirectionalLightIn obj;
@@ -301,7 +144,7 @@ void Renderer::init()
 	{
 		ParticleEmitterIn obj;
 		emitterList.push_back(obj);
-	}
+	}*/
 	
 	auto &a = AssetManager::instance();
 	auto &w = Window::instance();
@@ -358,9 +201,7 @@ void Renderer::init()
 
 void RenderEngine::Renderer::kill()
 {
-	objectList.clear();
-	directionalLightList.clear();
-	pointLightList.clear();
+	
 }
 
 void RenderEngine::Renderer::setCamera(Camera c)
@@ -372,9 +213,12 @@ void RenderEngine::Renderer::setCamera(Camera c)
 //RENDERING #$#$#$#$#$#$#$#$#$#$#$#
 void Renderer::render(float deltaTime)
 {
+	unsigned int dLightStart =  typeCounts[0] + 1;
+	unsigned int pLightStart =  typeCounts[0] + typeCounts[1] + 1;
+	unsigned int emitterStart = typeCounts[0] + typeCounts[1] + typeCounts[2] + 1;
 	//gpass ########################
 	gPass.prep();
-	
+
 	bindShader(AssetManager::instance().get<ASSET::SHADER>("GPassShader"));
 
 	setUniform("ProjectionView", UNIFORM::MAT4, glm::value_ptr(camera.getProjectionView()));
@@ -382,9 +226,9 @@ void Renderer::render(float deltaTime)
 
 	setUniform("ambientLight", UNIFORM::FLO3, glm::value_ptr(ambientLight));
 
-	for each (RenderObjectIn i in objectList)
+	for (unsigned i = 0; i < dLightStart; i++)
 	{
-		if (i.inUse && i.visible)
+		if (objectList[i].inUse && objectList[i].data.visible)
 		{
 			setUniform("Model", UNIFORM::MAT4, glm::value_ptr(i.transform.get()));
 
