@@ -183,6 +183,12 @@ bool AssetLibrary::AssetManager::loadShader(const char* name, const char* vertex
 	return true;
 }
 
+bool AssetLibrary::AssetManager::loadShaderG(const char * name, const char * vertexpath, const char * geometrypath, const char * fragmentpath)
+{
+	setInternal(ASSET::SHADER, name, ShaderLoader::createShaderProgramG(vertexpath, geometrypath, fragmentpath));
+	return false;
+}
+
 bool AssetLibrary::AssetManager::loadFBX(const char* name, const char* path)
 {
 	FBXFile file;
@@ -241,6 +247,53 @@ bool AssetLibrary::AssetManager::loadOBJ(const char* name, const char* path)
 bool AssetLibrary::AssetManager::manualAsset(const char * name, ASSET::GL_Handle_Type type, unsigned int handel)
 {
 	setInternal(type, name, handel);
+	return true;
+}
+
+bool AssetLibrary::AssetManager::buildParticleVAO(const char * name, const Particle * vert, unsigned int numVerts)
+{
+	GL_Handle vaoHandle;
+	GL_Handle vboHandle;
+	//GL_Handle iboHandle;
+	//Gen Buffers
+	glGenVertexArrays(1, &vaoHandle);
+	glGenBuffers(1, &vboHandle);
+	//glGenBuffers(1, &iboHandle);
+
+	//Store handles in asset manager
+	setInternal(ASSET::VAO, name, vaoHandle);
+	setInternal(ASSET::VBO, name, vboHandle);
+	//setInternal(ASSET::IBO, name, iboHandle);
+	//setInternal(ASSET::SIZE, name, isize);
+
+	//Set Data
+	glBindVertexArray(vaoHandle);
+	//vertex
+	glBindBuffer(GL_ARRAY_BUFFER, vboHandle);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Particle) * numVerts, vert, GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(3);
+	glEnableVertexAttribArray(4);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Particle), 0);//vec3
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)(sizeof(float) * 3));//vec3
+	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)(sizeof(float) * 4));//float
+	glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)(sizeof(float) * 5));//float
+	glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)(sizeof(float) * 6));//float
+	//unbind
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	return true;
+}
+
+bool AssetLibrary::AssetManager::buildParticleUpdateShader(const char * name, const char * vertexpath)
+{
+	setInternal(ASSET::SHADER, name, ShaderLoader::createShaderProgramParticle(vertexpath));
+
 	return true;
 }
 

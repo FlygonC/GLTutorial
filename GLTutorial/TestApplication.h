@@ -3,6 +3,8 @@
 #include "AssetLibrary.h"
 #include "FlyCamera.h"
 
+using namespace RenderEngine;
+
 class TestApplication : public AssetLibrary::Application
 {
 	void onInit();
@@ -12,5 +14,11 @@ class TestApplication : public AssetLibrary::Application
 
 	FlyCamera camera;
 
-	
+	GeometryObject object1;
+
+	DirectionalLightObject dLight1;
+
+	PointLightObject pLight1;
+
+	ParticleEmitterObject emitter1;
 };

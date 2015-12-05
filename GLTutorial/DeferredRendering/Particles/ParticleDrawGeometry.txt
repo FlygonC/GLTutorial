@@ -1,0 +1,52 @@
+#version 410
+
+layout(points) in;
+layout(triangle_strip, max_vertices = 4) out;
+
+in vec3 position[];
+in float lifeTime[];
+in float lifeSpan[];
+
+out vec4 color;
+
+uniform mat4 View;
+uniform mat4 ProjectionView;
+
+uniform float sizeStart;
+uniform float sizeEnd;
+
+uniform vec4 colorStart;
+uniform vec4 colorEnd;
+
+void main() 
+{
+	float age = lifeTime[0] / lifeSpan[0];
+
+	color = mix( colorStart, colorEnd, age );
+	float halfSize = mix( sizeStart, sizeEnd, age );
+	
+	vec3 corners[4];
+	corners[0] = vec3( halfSize, -halfSize, 0 );
+	corners[1] = vec3( halfSize, halfSize, 0 );
+	corners[2] = vec3( -halfSize, -halfSize, 0 );
+	corners[3] = vec3( -halfSize, halfSize, 0 );
+	
+	//BillBoarding
+	vec3 zAxis = normalize( View[3].xyz - position[0] );
+	vec3 xAxis = cross( View[1].xyz, zAxis );
+	vec3 yAxis = cross( zAxis, xAxis );
+	mat3 billboard = mat3( xAxis, yAxis, zAxis );
+	
+	
+	gl_Position = ProjectionView*vec4(billboard*corners[0]+position[0], 1);
+	EmitVertex();
+	
+	gl_Position = ProjectionView*vec4(billboard*corners[1]+position[0], 1);
+	EmitVertex();
+	
+	gl_Position = ProjectionView*vec4(billboard*corners[2]+position[0], 1);
+	EmitVertex();
+	
+	gl_Position = ProjectionView*vec4(billboard*corners[3]+position[0], 1);
+	EmitVertex();
+}

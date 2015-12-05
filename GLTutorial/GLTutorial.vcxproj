@@ -173,6 +173,7 @@
     <ClInclude Include="FBXLoader.h" />
     <ClInclude Include="FlyCamera.h" />
     <ClInclude Include="GLUtilities.h" />
+    <ClInclude Include="Particle.h" />
     <ClInclude Include="Render.h" />
     <ClInclude Include="RenderEngine.h" />
     <ClInclude Include="ShaderLoader.h" />
