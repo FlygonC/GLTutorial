@@ -7,6 +7,8 @@
 
 #include "ShaderLoader.h"
 
+#include "Particle.h"
+
 namespace AssetLibrary
 {
 	namespace ASSET
@@ -91,10 +93,13 @@ namespace AssetLibrary
 		bool buildTexture	(const char* name, unsigned int w, unsigned int h, unsigned int depth, const unsigned char* pixels = nullptr);
 		bool loadTexture	(const char* name, const char* path);
 		bool loadShader		(const char* name, const char* vertexpath, const char* fragmentpath);
+		bool loadShaderG	(const char* name, const char* vertexpath, const char* geometrypath, const char* fragmentpath);
 		bool loadFBX		(const char* name, const char* path);
 		bool loadOBJ		(const char* name, const char* path);
 
 		bool manualAsset(const char* name, ASSET::GL_Handle_Type type, unsigned int handel);
+		bool buildParticleVAO(const char* name, const struct Particle *vert, unsigned int numVerts);
+		bool buildParticleUpdateShader(const char* name, const char* vertexpath);
 
 		bool init();
 		void kill();

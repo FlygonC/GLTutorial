@@ -1,10 +1,13 @@
 #pragma once
 
 #include <vector>
+#include <algorithm>
 
 #include "Render.h"
 #include "AssetManager.h"
 #include "Camera.h"
+
+#include "Particle.h"
 
 using namespace AssetLibrary;
 
@@ -13,6 +16,10 @@ namespace RenderEngine
 	namespace UNIFORM
 	{
 		enum TYPE { NONE = 0, FLO1, FLO2, FLO3, FLO4, MAT4, INT1, TEX2, eSIZE };
+	}
+	namespace DATATYPE
+	{
+		enum TYPE { UNDEFINED = -1, GEOMETRY = 0, DIRECTIONALLIGHT, POINTLIGHT, PARTICLEEMITTER };
 	}
 
 	struct Transform
@@ -58,239 +65,133 @@ namespace RenderEngine
 			return *this;
 		}
 	};
-
-	struct RenderObjectEx
-	{
-	private:
-		unsigned int referenceID;
-	public:
-		Asset<ASSET::VAO> mesh;
-		Transform transform;
-		Material material;
-		bool visible = true;
-
-		void instantiate();
-		void update();
-		void destroy();
-		unsigned int getReferenceID();
-	};
-	struct DirectionalLightEx
-	{
-	private:
-		unsigned int referenceID;
-	public:
-		glm::vec3 color = glm::vec3(0);
-		glm::vec3 direction = glm::vec3(1);
-		bool visible = true;
-
-		void instantiate();
-		void update();
-		void destroy();
-		unsigned int getReferenceID();
-	};
-	struct PointLightEx
-	{
-	private:
-		unsigned int referenceID;
-	public:
-		glm::vec3 color = glm::vec3(0);
-		glm::vec3 position = glm::vec3(0);
-		float radius = 1;
-		bool visible = true;
-
-		void instantiate();
-		void update();
-		void destroy();
-		unsigned int getReferenceID();
-	};
-	
-
 	template<typename T>
 	struct Range
 	{
-		T start, end;
+		//typename type = T;
+		T start;
+		T end;
 		void operator=(T other)
 		{
 			start = other;
 			end = other;
 		}
 	};
-	struct Particle
+
+
+
+	class RenderObjectData
 	{
-		Transform trans;
-		Material mat;
-		glm::vec3 direction = glm::vec3(0);
-		float velocity;
-		glm::vec3 color;
-		float lifeTime = 0;
-		bool live = false;
-	};
-	class ParticleEmitterEx
-	{
-		unsigned int referenceID;
-		//Particle particles[50];
+	protected:
+		//DATATYPE::TYPE type = DATATYPE::UNDEFINED;
 	public:
-		glm::vec3 source = glm::vec3(0);
-		Range<float> velocity;
-		Range<glm::vec3> direction;
-		Range<glm::vec3> size;
-		Range<glm::vec3> color;
-		float maxLife = 1;
-		float emittionRate = 0.02f;
+		//glm::vec3 position = glm::vec3(0);
+		bool visible = true;
+		bool inUse = false;
+	};
+
+	class Geometry : public RenderObjectData
+	{
+	public:
+		//GeometryData() { type = DATATYPE::GEOMETRY; }
 
 		Asset<ASSET::VAO> mesh;
+		Transform transform;
+		Material material;
+	};
+	class DirectionalLight : public RenderObjectData
+	{
+	public:
+		//DirectionalLightData() { type = DATATYPE::DIRECTIONALLIGHT; }
 
-		void instantiate();
-		void update();
-		void destroy();
-		unsigned int getReferenceID();
+		glm::vec3 color = glm::vec3(1);
+		glm::vec3 direction = glm::vec3(1);
+	};
+	class PointLight : public RenderObjectData
+	{
+	public:
+		//PointLightData() { type = DATATYPE::POINTLIGHT; }
+
+		glm::vec3 color = glm::vec3(1);
+		glm::vec3 position = glm::vec3(0);
+		float radius = 1;
+	};	
+	class ParticleEmitter : public RenderObjectData
+	{
+		unsigned int maxParts = 1000;
+	public:
+		//ParticleEmitterData() { type = DATATYPE::PARTICLEEMITTER; }
+		void createBuffers();
+		void clearBuffers();
+		unsigned int getMaxParts()
+		{
+			return maxParts;
+		}
+
+		Transform transform;
+
+		Particle *particles;
+
+		Range<glm::vec3> velocity;
+		//Range<glm::vec3> direction;
+		Range<float> size;
+		Range<glm::vec3> color;
+		Range<float> maxLife;
+		Range<float> emittionRate;
+
+		unsigned int activeBuffer = 0;
+		unsigned int VAO[2];
+		unsigned int VBO[2];
 	};
 	
+
+
+	class BaseObject 
+	{
+	public:
+		BaseObject() {}
+	};
+	class GeometryObject : public BaseObject
+	{
+		unsigned int idNum;
+	public:
+		GeometryObject();
+		~GeometryObject();
+
+		Geometry* data;
+	};
+	class DirectionalLightObject : public BaseObject
+	{
+		unsigned int idNum;
+	public:
+		DirectionalLightObject();
+		~DirectionalLightObject();
+
+		DirectionalLight* data;
+	};
+	class PointLightObject : public BaseObject
+	{
+		unsigned int idNum;
+	public:
+		PointLightObject();
+		~PointLightObject();
+
+		PointLight* data;
+	};
+	class ParticleEmitterObject : public BaseObject
+	{
+		unsigned int idNum;
+	public:
+		ParticleEmitterObject();
+		~ParticleEmitterObject();
+
+		ParticleEmitter* data;
+	};
+
+
+	const unsigned int objectCount = 300;
 	class Renderer
 	{
-		struct RenderObjectIn
-		{
-			Asset<ASSET::VAO> mesh;
-			Transform transform;
-			Material material;
-			bool visible = true;
-
-			bool inUse = false;
-
-			RenderObjectIn operator=(RenderObjectEx other)
-			{
-				this->mesh = other.mesh;
-				this->transform = other.transform;
-				this->material = other.material;
-				this->visible = other.visible;
-				return *this;
-			}
-		};
-		struct DirectionalLightIn
-		{
-			glm::vec3 color = glm::vec3(1);
-			glm::vec3 direction = glm::vec3(1);
-			bool visible = true;
-
-			bool inUse = false;
-
-			DirectionalLightIn operator=(DirectionalLightEx other)
-			{
-				this->color = other.color;
-				this->direction = other.direction;
-				return *this;
-			}
-		};
-		struct PointLightIn
-		{
-			glm::vec3 color = glm::vec3(1);
-			glm::vec3 position = glm::vec3(0);
-			float radius = 1;
-			bool visible = true;
-
-			bool inUse = false;
-
-			PointLightIn operator=(PointLightEx other)
-			{
-				this->color = other.color;
-				this->position = other.position;
-				this->radius = other.radius;
-				return *this;
-			}
-		};
-
-		class ParticleEmitterIn
-		{
-		public:
-			Particle particles[50];
-
-			glm::vec3 source;
-			Range<float> velocity;
-			Range<glm::vec3> direction;
-			Range<glm::vec3> size;
-			Range<glm::vec3> color;
-			float maxLife = 1;
-			float emittionRate;
-
-			Asset<ASSET::VAO> mesh;
-
-			bool inUse = false;
-
-			void createPart()
-			{
-				particles[currentPart].trans.position = source;
-				particles[currentPart].velocity = velocity.start;
-
-				float random1 = (rand() % 100);
-				float random2 = (random1 - 1) / 100;
-				particles[currentPart].direction.x = glm::lerp(-1.f, 1.f, random2);
-				random1 = (rand() % 100);
-				random2 = (random1 - 1) / 100;
-				particles[currentPart].direction.y = glm::lerp(-1.f, 1.f, random2);
-				random1 = (rand() % 100);
-				random2 = (random1 - 1) / 100;
-				particles[currentPart].direction.z = glm::lerp(-1.f, 1.f, random2);
-
-				particles[currentPart].color = color.start;
-				particles[currentPart].lifeTime = 0;
-				particles[currentPart].live = true;
-
-				currentPart++;
-				if (currentPart >= 50)
-				{
-					currentPart = 0;
-				}
-			}
-			void update(float deltaTime)
-			{
-				lastEmit += deltaTime;
-				while (lastEmit >= emittionRate)
-				{
-					createPart();
-					lastEmit -= emittionRate;
-				}
-
-				for (unsigned i = 0; i < 50; i++)
-				{
-					if (particles[i].live)
-					{
-						float lerpValue = particles[i].lifeTime / maxLife;
-
-						particles[i].velocity = glm::lerp(velocity.start, velocity.end, lerpValue);
-						particles[i].trans.position += particles[i].direction * particles[i].velocity * deltaTime;
-
-						particles[i].trans.scale = glm::lerp(size.start, size.end, lerpValue);
-
-						particles[i].color = glm::lerp(color.start, color.end, lerpValue);
-
-						particles[i].lifeTime += deltaTime;
-						if (particles[i].lifeTime >= maxLife)
-						{
-							particles[i].live = false;
-						}
-					}
-				}
-			}
-
-			ParticleEmitterIn operator=(ParticleEmitterEx other)
-			{
-				this->source = other.source;
-				this->velocity = other.velocity;
-				this->direction = other.direction;
-				this->size = other.size;
-				this->color = other.color;
-				this->maxLife = other.maxLife;
-				this->emittionRate = other.emittionRate;
-
-				this->mesh = other.mesh;
-
-				return *this;
-			}
-		private:
-			int currentPart = 0;
-			float lastEmit = 0;
-		};
-
 		class GPassRender : public RenderPass
 		{
 		public:
@@ -298,7 +199,6 @@ namespace RenderEngine
 			void post();
 			//void draw(RenderObjectIn ob, Camera c);
 		};
-		
 		class DLightPassRender : public RenderPass
 		{
 		public:
@@ -321,11 +221,6 @@ namespace RenderEngine
 			//void draw();
 		};
 
-		std::vector<RenderObjectIn> objectList = std::vector<RenderObjectIn>();
-		std::vector<DirectionalLightIn> directionalLightList = std::vector<DirectionalLightIn>();
-		std::vector<PointLightIn> pointLightList = std::vector<PointLightIn>();
-		std::vector<ParticleEmitterIn> emitterList = std::vector<ParticleEmitterIn>();
-
 		GPassRender gPass;
 		DLightPassRender dLight;
 		PLightPassRender pLight;
@@ -334,19 +229,16 @@ namespace RenderEngine
 		unsigned int boundShader;
 		unsigned int boundFrameBuffer;
 
-		glm::vec3 ambientLight = glm::vec3(0.5f);
+		glm::vec3 ambientLight = glm::vec3(0.1f);
 		Camera camera;
 
 		Renderer() {}
 
-		unsigned int newObject();
-		unsigned int newDLight();
-		unsigned int newPLight();
-		unsigned int newEmitter();
-
 		//void bindFBO(unsigned int fbo);
 		void bindShader(unsigned int shader);
 		bool setUniform(const char* name, UNIFORM::TYPE type, const void* value, unsigned count = 1, bool normalize = false);
+
+		//static bool compare(const DATATYPE::TYPE &l, const DATATYPE::TYPE &r);
 
 	public:
 		static Renderer &instance()
@@ -358,24 +250,18 @@ namespace RenderEngine
 		void init();
 		void kill();
 
-		unsigned int createObject(RenderObjectEx* in);
-		void updateObject(RenderObjectEx* in, unsigned int id);
-		void clearObject(unsigned int id);
-		
-		unsigned int createDLight(DirectionalLightEx* in);
-		void updateDLight(DirectionalLightEx* in, unsigned int id);
-		void clearDLight(unsigned int id);
+		unsigned int newObject(DATATYPE::TYPE type);
+		void updateObject(unsigned int tag, RenderObjectData* in);
+		void clearObject(DATATYPE::TYPE type, unsigned int tag);
 
-		unsigned int createPLight(PointLightEx* in);
-		void updatePLight(PointLightEx* in, unsigned int id);
-		void clearPLight(unsigned int id);
 
-		unsigned int createEmitter(ParticleEmitterEx* in);
-		void updateEmitter(ParticleEmitterEx* in, unsigned int id);
-		void clearEmitter(unsigned int id);
-		
 		void setCamera(Camera c);
 
 		void render(float deltaTime);
+
+		Geometry geometryData[objectCount];
+		DirectionalLight directionalLightData[objectCount];
+		PointLight pointLightData[objectCount];
+		ParticleEmitter emitterData[objectCount];
 	};
 }

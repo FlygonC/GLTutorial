@@ -2,217 +2,192 @@
 
 using namespace RenderEngine;
 
-// Render Object ###################
-void RenderObjectEx::instantiate()
+GeometryObject::GeometryObject()
 {
-	referenceID = Renderer::instance().createObject(this);
+	idNum = Renderer::instance().newObject(DATATYPE::GEOMETRY);
+	data = &Renderer::instance().geometryData[idNum];
+}
+GeometryObject::~GeometryObject()
+{
+	Renderer::instance().clearObject(DATATYPE::GEOMETRY, idNum);
 }
 
-void RenderObjectEx::update()
+
+
+RenderEngine::DirectionalLightObject::DirectionalLightObject()
 {
-	Renderer::instance().updateObject(this, referenceID);
+	idNum = Renderer::instance().newObject(DATATYPE::DIRECTIONALLIGHT);
+	data = &Renderer::instance().directionalLightData[idNum];
 }
 
-void RenderObjectEx::destroy()
+RenderEngine::DirectionalLightObject::~DirectionalLightObject()
 {
-	Renderer::instance().clearObject(referenceID);
+	Renderer::instance().clearObject(DATATYPE::DIRECTIONALLIGHT, idNum);
 }
 
-unsigned int RenderObjectEx::getReferenceID()
+
+
+
+RenderEngine::PointLightObject::PointLightObject()
 {
-	return referenceID;
+	idNum = Renderer::instance().newObject(DATATYPE::POINTLIGHT);
+	data = &Renderer::instance().pointLightData[idNum];
 }
-//internal
-unsigned int Renderer::newObject()
+
+RenderEngine::PointLightObject::~PointLightObject()
 {
-	//Search for an object in vector tagged Unused
-	for (unsigned i = 0; i < objectList.size(); i++)
+	Renderer::instance().clearObject(DATATYPE::POINTLIGHT, idNum);
+}
+
+
+
+
+void RenderEngine::ParticleEmitter::createBuffers()
+{
+	particles = new Particle[maxParts];
+	for (unsigned i = 0; i < 2; i++)
 	{
-		if (objectList[i].inUse == false)
-		{
-			return i;
-		}
+		glGenVertexArrays(1, &VAO[i]);
+		glGenBuffers(1, &VBO[i]);
+		//glGenBuffers(1, &iboHandle);
+
+		//Set Data
+		glBindVertexArray(VAO[i]);
+		//vertex
+		glBindBuffer(GL_ARRAY_BUFFER, VBO[i]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(Particle) * maxParts, particles, GL_STATIC_DRAW);
+
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+		glEnableVertexAttribArray(2);
+		glEnableVertexAttribArray(3);
+		//glEnableVertexAttribArray(4);
+
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Particle), 0);//vec3
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)(sizeof(float) * 3));//vec3
+		glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)(sizeof(float) * 6));//float
+		glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)(sizeof(float) * 7));//float
+		//glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)(sizeof(float) * 8));//float
+		//unbind
+		glBindVertexArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
-	return objectList.size() - 1;
 }
-unsigned int Renderer::createObject(RenderObjectEx* in)
+void RenderEngine::ParticleEmitter::clearBuffers()
 {
-	unsigned int slot = newObject();
-	objectList[slot] = *in;
-	objectList[slot].inUse = true;
-	return slot;
-}
-
-void Renderer::updateObject(RenderObjectEx* in, unsigned int id)
-{
-	objectList[id] = *in;
-}
-
-void Renderer::clearObject(unsigned int id)
-{
-	objectList[id].inUse = false;
-}
-
-
-
-
-// Directional Light ###################
-void DirectionalLightEx::instantiate()
-{
-	referenceID = Renderer::instance().createDLight(this);
-}
-
-void DirectionalLightEx::update()
-{
-	Renderer::instance().updateDLight(this, referenceID);
-}
-
-void DirectionalLightEx::destroy()
-{
-	Renderer::instance().clearDLight(referenceID);
-}
-
-unsigned int DirectionalLightEx::getReferenceID()
-{
-	return referenceID;
-}
-//internal
-unsigned int Renderer::newDLight()
-{
-	//Search for an object in vector tagged Unused
-	for (unsigned i = 0; i < directionalLightList.size(); i++)
+	for (unsigned i = 0; i < 2; i++)
 	{
-		if (directionalLightList[i].inUse == false)
-		{
-			return i;
-		}
+		glDeleteBuffers(1, &VAO[i]);
+		glDeleteBuffers(1, &VBO[i]);
 	}
-	return directionalLightList.size() - 1;
 }
-unsigned int Renderer::createDLight(DirectionalLightEx* in)
+RenderEngine::ParticleEmitterObject::ParticleEmitterObject()
 {
-	unsigned int slot = newDLight();
-	directionalLightList[slot] = *in;
-	directionalLightList[slot].inUse = true;
-	return slot;
+	idNum = Renderer::instance().newObject(DATATYPE::PARTICLEEMITTER);
+	data = &Renderer::instance().emitterData[idNum];
 }
 
-void Renderer::updateDLight(DirectionalLightEx* in, unsigned int id)
+RenderEngine::ParticleEmitterObject::~ParticleEmitterObject()
 {
-	directionalLightList[id] = *in;
-}
-
-void Renderer::clearDLight(unsigned int id)
-{
-	directionalLightList[id].inUse = false;
+	Renderer::instance().clearObject(DATATYPE::PARTICLEEMITTER, idNum);
+	data->clearBuffers();
 }
 
 
 
 
-// Point Light ################
-void PointLightEx::instantiate()
-{
-	referenceID = Renderer::instance().createPLight(this);
-}
 
-void PointLightEx::update()
-{
-	Renderer::instance().updatePLight(this, referenceID);
-}
 
-void PointLightEx::destroy()
-{
-	Renderer::instance().clearPLight(referenceID);
-}
 
-unsigned int PointLightEx::getReferenceID()
+unsigned int Renderer::newObject(DATATYPE::TYPE type)
 {
-	return referenceID;
-}
-//internal
-unsigned int Renderer::newPLight()
-{
-	//Search for an object in vector tagged Unused
-	for (unsigned i = 0; i < pointLightList.size(); i++)
+	switch (type)
 	{
-		if (pointLightList[i].inUse == false)
+	case DATATYPE::GEOMETRY:
+		for (unsigned i = 0; i < objectCount; i++)
 		{
-			return i;
+			if (geometryData[i].inUse == false)
+			{
+				geometryData[i].inUse = true;
+				return i;
+			}
 		}
+		break;
+
+	case DATATYPE::DIRECTIONALLIGHT:
+		for (unsigned i = 0; i < objectCount; i++)
+		{
+			if (directionalLightData[i].inUse == false)
+			{
+				directionalLightData[i].inUse = true;
+				return i;
+			}
+		}
+		break;
+
+	case DATATYPE::POINTLIGHT:
+		for (unsigned i = 0; i < objectCount; i++)
+		{
+			if (pointLightData[i].inUse == false)
+			{
+				pointLightData[i].inUse = true;
+				return i;
+			}
+		}
+		break;
+
+	case DATATYPE::PARTICLEEMITTER:
+		for (unsigned i = 0; i < objectCount; i++)
+		{
+			if (emitterData[i].inUse == false)
+			{
+				emitterData[i].inUse = true;
+				//emitterData[i].createBuffers();
+				return i;
+			}
+		}
+		break;
+
+	default:
+		break;
 	}
-	return pointLightList.size() - 1;
-}
-unsigned int Renderer::createPLight(PointLightEx* in)
-{
-	unsigned int slot = newPLight();
-	pointLightList[slot] = *in;
-	pointLightList[slot].inUse = true;
-	return slot;
+	return -1;
 }
 
-void Renderer::updatePLight(PointLightEx* in, unsigned int id)
+void Renderer::updateObject(unsigned int tag, RenderObjectData* in)
 {
-	pointLightList[id] = *in;
+	
 }
 
-void Renderer::clearPLight(unsigned int id)
+void Renderer::clearObject(DATATYPE::TYPE type, unsigned int tag)
 {
-	pointLightList[id].inUse = false;
-}
-
-
-
-// Particle Emitter ################
-void ParticleEmitterEx::instantiate()
-{
-	referenceID = Renderer::instance().createEmitter(this);
-}
-
-void ParticleEmitterEx::update()
-{
-	Renderer::instance().updateEmitter(this, referenceID);
-}
-
-void ParticleEmitterEx::destroy()
-{
-	Renderer::instance().clearEmitter(referenceID);
-}
-
-unsigned int ParticleEmitterEx::getReferenceID()
-{
-	return referenceID;
-}
-//internal
-unsigned int Renderer::newEmitter()
-{
-	//Search for an object in vector tagged Unused
-	for (unsigned i = 0; i < emitterList.size(); i++)
+	switch (type)
 	{
-		if (emitterList[i].inUse == false)
-		{
-			return i;
-		}
+	case DATATYPE::GEOMETRY:
+		geometryData[tag].inUse = false;
+		break;
+
+	case DATATYPE::DIRECTIONALLIGHT:
+		directionalLightData[tag].inUse = false;
+		break;
+
+	case DATATYPE::POINTLIGHT:
+		pointLightData[tag].inUse = false;
+		break;
+
+	case DATATYPE::PARTICLEEMITTER:
+		emitterData[tag].inUse = false;
+		break;
+
+	default:
+		break;
 	}
-	return emitterList.size() - 1;
-}
-unsigned int Renderer::createEmitter(ParticleEmitterEx* in)
-{
-	unsigned int slot = newEmitter();
-	emitterList[slot] = *in;
-	emitterList[slot].inUse = true;
-	return slot;
 }
 
-void Renderer::updateEmitter(ParticleEmitterEx* in, unsigned int id)
-{
-	emitterList[id] = *in;
-}
 
-void Renderer::clearEmitter(unsigned int id)
-{
-	emitterList[id].inUse = false;
-}
+
+
+
 
 
 
@@ -248,31 +223,12 @@ bool Renderer::setUniform(const char * name, UNIFORM::TYPE type, const void * va
 //management
 void Renderer::init()
 {
-	objectList.reserve(100);
-	for (unsigned i = 0; i < 100; i++)
+	for (unsigned i = 0; i < objectCount; i++)
 	{
-		RenderObjectIn obj;
-		objectList.push_back(obj);
+		emitterData[i].createBuffers();
 	}
-	directionalLightList.reserve(100);
-	for (unsigned i = 0; i < 100; i++)
-	{
-		DirectionalLightIn obj;
-		directionalLightList.push_back(obj);
-	}
-	pointLightList.reserve(100);
-	for (unsigned i = 0; i < 100; i++)
-	{
-		PointLightIn obj;
-		pointLightList.push_back(obj);
-	}
-	emitterList.reserve(5);
-	for (unsigned i = 0; i < 5; i++)
-	{
-		ParticleEmitterIn obj;
-		emitterList.push_back(obj);
-	}
-	
+
+
 	auto &a = AssetManager::instance();
 	auto &w = Window::instance();
 	//GPASS
@@ -282,6 +238,10 @@ void Renderer::init()
 	//gPass.fbo = "GPassFrameBuffer";
 	a.loadShader("GPassShader", "./DeferredRendering/GPass/GVertex.txt", "./DeferredRendering/GPass/GFragment.txt");
 	//gPass.shader = "GPassShader";
+
+	//PARTICLES
+	a.loadShaderG("ParticleDrawShader", "./DeferredRendering/Particles/ParticleDrawVertex.txt", "./DeferredRendering/Particles/ParticleDrawGeometry.txt", "./DeferredRendering/Particles/ParticleDrawFragment.txt");
+	a.buildParticleUpdateShader("ParticleUpdateShader", "./DeferredRendering/Particles/ParticleUpdateVertex.txt");
 
 	//SHADOW
 	unsigned int buffer;
@@ -328,9 +288,7 @@ void Renderer::init()
 
 void RenderEngine::Renderer::kill()
 {
-	objectList.clear();
-	directionalLightList.clear();
-	pointLightList.clear();
+	
 }
 
 void RenderEngine::Renderer::setCamera(Camera c)
@@ -344,7 +302,7 @@ void Renderer::render(float deltaTime)
 {
 	//gpass ########################
 	gPass.prep();
-	
+
 	bindShader(AssetManager::instance().get<ASSET::SHADER>("GPassShader"));
 
 	setUniform("ProjectionView", UNIFORM::MAT4, glm::value_ptr(camera.getProjectionView()));
@@ -352,80 +310,106 @@ void Renderer::render(float deltaTime)
 
 	setUniform("ambientLight", UNIFORM::FLO3, glm::value_ptr(ambientLight));
 
-	for each (RenderObjectIn i in objectList)
+	for (unsigned i = 0; i < objectCount; i++)
 	{
-		if (i.inUse && i.visible)
+		//GeometryData iter = geometryData[i];
+		if (geometryData[i].inUse && geometryData[i].visible)
 		{
-			setUniform("Model", UNIFORM::MAT4, glm::value_ptr(i.transform.get()));
+			setUniform("Model",			UNIFORM::MAT4, glm::value_ptr(geometryData[i].transform.get()));
 
-			setUniform("specPower", UNIFORM::FLO1, &i.material.specularPower);
+			setUniform("specPower",		UNIFORM::FLO1, &geometryData[i].material.specularPower);
 
-			setUniform("diffuseTint", UNIFORM::FLO3, glm::value_ptr(i.material.diffuseTint));
-			setUniform("specularTint", UNIFORM::FLO3, glm::value_ptr(i.material.specularTint));
-			setUniform("glowTint", UNIFORM::FLO3, glm::value_ptr(i.material.glowTint));
+			setUniform("diffuseTint",	UNIFORM::FLO3, glm::value_ptr(geometryData[i].material.diffuseTint));
+			setUniform("specularTint",	UNIFORM::FLO3, glm::value_ptr(geometryData[i].material.specularTint));
+			setUniform("glowTint",		UNIFORM::FLO3, glm::value_ptr(geometryData[i].material.glowTint));
 
-			setUniform("diffuseMap", UNIFORM::TEX2, i.material.diffuseTexture, 0);
-			setUniform("normalMap", UNIFORM::TEX2, i.material.normalTexture, 1);
-			setUniform("specularMap", UNIFORM::TEX2, i.material.specularTexture, 2);
-			setUniform("glowMap", UNIFORM::TEX2, i.material.glowTexture, 3);
+			setUniform("diffuseMap",	UNIFORM::TEX2, geometryData[i].material.diffuseTexture, 0);
+			setUniform("normalMap",		UNIFORM::TEX2, geometryData[i].material.normalTexture, 1);
+			setUniform("specularMap",	UNIFORM::TEX2, geometryData[i].material.specularTexture, 2);
+			setUniform("glowMap",		UNIFORM::TEX2, geometryData[i].material.glowTexture, 3);
 
-			glBindVertexArray(AssetManager::instance().get<ASSET::VAO>(i.mesh.name.c_str()));
-			glDrawElements(GL_TRIANGLES, AssetManager::instance().get<ASSET::SIZE>(i.mesh.name.c_str()), GL_UNSIGNED_INT, 0);
+			glBindVertexArray(AssetManager::instance().get<ASSET::VAO>(geometryData[i].mesh.name.c_str()));
+			glDrawElements(GL_TRIANGLES, AssetManager::instance().get<ASSET::SIZE>(geometryData[i].mesh.name.c_str()), GL_UNSIGNED_INT, 0);
 		}
 	}
+
+	//glDisable(GL_DEPTH_TEST);
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glUseProgram(0);
+
 	// PARTICLES
-	for (unsigned i = 0; i < 5; i++)
+	for (unsigned i = 0; i < objectCount; i++)
 	{
-		if (emitterList[i].inUse)
+		if (emitterData[i].inUse)
 		{
-			emitterList[i].update(deltaTime);
-			for (unsigned j = 0; j < 50; j++)
-			{
-				if (emitterList[i].particles[j].live)
-				{
-					setUniform("Model", UNIFORM::MAT4, glm::value_ptr(emitterList[i].particles[j].trans.get()));
+			//Update
+			bindShader(AssetManager::instance().get<ASSET::SHADER>("ParticleUpdateShader"));
 
-					float zero = 0;
-					setUniform("specPower", UNIFORM::FLO1, &zero);
+			float kyhxc = 0.1f;
 
-					setUniform("diffuseTint", UNIFORM::FLO3, glm::value_ptr(emitterList[i].particles[j].color));
-					setUniform("specularTint", UNIFORM::FLO3, glm::value_ptr(glm::vec3(0)));
-					setUniform("glowTint", UNIFORM::FLO3, glm::value_ptr(glm::vec3(0)));
+			float time = Window::instance().getTime();
+			setUniform("time", UNIFORM::FLO1, &time);
+			setUniform("deltaTime", UNIFORM::FLO1, &deltaTime);
+			setUniform("lifeMin", UNIFORM::FLO1, &emitterData[i].maxLife.start);
+			setUniform("lifeMax", UNIFORM::FLO1, &emitterData[i].maxLife.end);
+			setUniform("emitterPosition", UNIFORM::FLO3, &emitterData[i].transform.position);
 
-					Asset<ASSET::TEXTURE> d;
-					d = "Black";
-					setUniform("diffuseMap", UNIFORM::TEX2, &d, 0);
-					Asset<ASSET::TEXTURE> n;
-					n = "Flat";
-					setUniform("normalMap", UNIFORM::TEX2, &n, 1);
-					Asset<ASSET::TEXTURE> s;
-					s = "Black";
-					setUniform("specularMap", UNIFORM::TEX2, &s, 2);
-					Asset<ASSET::TEXTURE> g;
-					g = "Black";
-					setUniform("glowMap", UNIFORM::TEX2, &g, 3);
+			glEnable(GL_RASTERIZER_DISCARD);
+			// Read from ActiveBuffer
+			glBindVertexArray(emitterData[i].VAO[emitterData[i].activeBuffer]);
+			unsigned int otherBuffer = (emitterData[i].activeBuffer + 1) % 2;
+			// Write to OtherBuffer
+			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, emitterData[i].VBO[otherBuffer]);
+			glBeginTransformFeedback(GL_POINTS);
 
-					glBindVertexArray(AssetManager::instance().get<ASSET::VAO>("Cube"));
-					glDrawElements(GL_TRIANGLES, AssetManager::instance().get<ASSET::SIZE>("Cube"), GL_UNSIGNED_INT, 0);
-				}
-			}
+			glDrawArrays(GL_POINTS, 0, emitterData[i].getMaxParts());
+
+			glEndTransformFeedback();
+			glDisable(GL_RASTERIZER_DISCARD);
+			glBindBufferBase(GL_TRANSFORM_FEEDBACK, 0, 0);
+			//Draw
+			bindShader(AssetManager::instance().get<ASSET::SHADER>("ParticleDrawShader"));
+
+			setUniform("ProjectionView", UNIFORM::MAT4, glm::value_ptr(camera.getProjectionView()));
+			setUniform("WorldTransform", UNIFORM::MAT4, glm::value_ptr(camera.getWorldTransform()));
+
+			setUniform("sizeStart", UNIFORM::FLO1, &emitterData[i].size.start);
+			setUniform("sizeEnd",	UNIFORM::FLO1, &emitterData[i].size.end);
+			setUniform("colorStart", UNIFORM::FLO4, glm::value_ptr(glm::vec4(emitterData[i].color.start, 0)));
+			setUniform("colorEnd",	 UNIFORM::FLO4, glm::value_ptr(glm::vec4(emitterData[i].color.end, 0)));
+
+			glBindVertexArray(emitterData[i].VAO[otherBuffer]);
+			glDrawArrays(GL_POINTS, 0, emitterData[i].getMaxParts());
+			//glDrawArrays(GL_POINTS, 0, 1);
+
+			emitterData[i].activeBuffer = otherBuffer;
 		}
 	}
+	/////////////////////////////////////////////////////////////////////////////
+	// (UPDATE SHADER)
+		// use program
+		// bind uniforms etc.
+		// disable rasterization
+		// bind VAO and VBO for base buffer, use beginTRansformFeedback
+		// do the draw and disable transform feedback
 
-	gPass.post();
+	// (Draw Shader)
+		// works the same as usual.
 
+	/////////////////////////////////////////////////////////////////////////////
+	glDisable(GL_DEPTH_TEST);
 	//PRE LIGHT CLEAR
 	glBindFramebuffer(GL_FRAMEBUFFER, AssetManager::instance().get<ASSET::FBO>("LightFrameBuffer"));
 	glClear(GL_COLOR_BUFFER_BIT);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	//Directional Light ########################
-	for each (DirectionalLightIn i in directionalLightList)
+	for (unsigned i = 0; i < objectCount; i++)
 	{
-		if (i.inUse && i.visible)
+		if (directionalLightData[i].inUse && directionalLightData[i].visible)
 		{
 			//shadow %%%%%%%%
-/*prep*/	glm::vec3 m_lightDirection = glm::normalize(i.direction);
+/*prep*/	glm::vec3 m_lightDirection = glm::normalize(directionalLightData[i].direction);
 			float projSize = 200;
 			glm::mat4 lightProjection = glm::ortho<float>(-projSize, projSize, -projSize, projSize, -projSize, projSize);
 			glm::mat4 lightView = glm::lookAt(glm::vec3(camera.getView()[3]), glm::vec3(camera.getView()[3]) - m_lightDirection, glm::vec3(0, 1, 0));
@@ -445,14 +429,14 @@ void Renderer::render(float deltaTime)
 			bindShader(AssetManager::instance().get<ASSET::SHADER>("ShadowShader"));
 			setUniform("lightMatrix", UNIFORM::MAT4, glm::value_ptr(m_lightMatrix));
 
-/*draw*/	for each (RenderObjectIn j in objectList)
+/*draw*/	for (unsigned j = 0; j < objectCount; j++)
 			{
-				if (j.inUse && j.visible)
+				if (geometryData[j].inUse && geometryData[j].visible)
 				{
-					setUniform("Model", UNIFORM::MAT4, glm::value_ptr(j.transform.get()));
+					setUniform("Model", UNIFORM::MAT4, glm::value_ptr(geometryData[j].transform.get()));
 
-					glBindVertexArray(AssetManager::instance().get<ASSET::VAO>(j.mesh.name.c_str()));
-					glDrawElements(GL_TRIANGLES, AssetManager::instance().get<ASSET::SIZE>(j.mesh.name.c_str()), GL_UNSIGNED_INT, 0);
+					glBindVertexArray(AssetManager::instance().get<ASSET::VAO>(geometryData[j].mesh.name.c_str()));
+					glDrawElements(GL_TRIANGLES, AssetManager::instance().get<ASSET::SIZE>(geometryData[j].mesh.name.c_str()), GL_UNSIGNED_INT, 0);
 				}
 			}
 
@@ -473,8 +457,8 @@ void Renderer::render(float deltaTime)
 			//std::cout << d.x << " " << d.y << " " << d.z << std::endl;
 			setUniform("cameraPosition", UNIFORM::FLO3, glm::value_ptr(d));
 		
-			setUniform("lightDirection", UNIFORM::FLO3, glm::value_ptr(i.direction));
-			setUniform("lightDiffuse", UNIFORM::FLO3, glm::value_ptr(i.color));
+			setUniform("lightDirection", UNIFORM::FLO3, glm::value_ptr(directionalLightData[i].direction));
+			setUniform("lightDiffuse", UNIFORM::FLO3, glm::value_ptr(directionalLightData[i].color));
 
 			setUniform("lightMatrix", UNIFORM::MAT4, glm::value_ptr(m_lightMatrix));
 
@@ -505,19 +489,19 @@ void Renderer::render(float deltaTime)
 	
 	bindShader(AssetManager::instance().get<ASSET::SHADER>("PLightShader"));
 
-	for each (PointLightIn i in pointLightList)
+	for (unsigned i = 0; i < objectCount; i++)
 	{
-		if (i.inUse && i.visible)
+		if (pointLightData[i].inUse && pointLightData[i].visible)
 		{
 			setUniform("ProjectionView", UNIFORM::MAT4, glm::value_ptr(camera.getProjectionView()));
 			setUniform("cameraView", UNIFORM::MAT4, glm::value_ptr(camera.getView()));
 			setUniform("cameraPosition", UNIFORM::FLO3, glm::value_ptr(camera.getWorldTransform()[3]));
 
-			setUniform("lightPositionView", UNIFORM::FLO3, glm::value_ptr(camera.getView() * glm::vec4(i.position, 1)));
+			setUniform("lightPositionView", UNIFORM::FLO3, glm::value_ptr(camera.getView() * glm::vec4(pointLightData[i].position, 1)));
 
-			setUniform("lightPosition", UNIFORM::FLO3, glm::value_ptr(i.position));
-			setUniform("lightDiffuse", UNIFORM::FLO3, glm::value_ptr(i.color));
-			setUniform("lightRadius", UNIFORM::FLO1, &i.radius);
+			setUniform("lightPosition", UNIFORM::FLO3, glm::value_ptr(pointLightData[i].position));
+			setUniform("lightDiffuse", UNIFORM::FLO3, glm::value_ptr(pointLightData[i].color));
+			setUniform("lightRadius", UNIFORM::FLO1, &pointLightData[i].radius);
 
 			Asset<ASSET::TEXTURE> p;
 			p = "GPassPosition";
@@ -584,7 +568,7 @@ void Renderer::GPassRender::prep()
 void Renderer::GPassRender::post()
 {
 	glDisable(GL_DEPTH_TEST);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glUseProgram(0);
 }
 
@@ -751,3 +735,5 @@ void RenderEngine::Renderer::CompositePassRender::post()
 	glBindVertexArray(AssetManager::instance().get<ASSET::VAO>("Quad"));
 	glDrawElements(GL_TRIANGLES, AssetManager::instance().get<ASSET::SIZE>("Quad"), GL_UNSIGNED_INT, 0);
 }*/
+
+

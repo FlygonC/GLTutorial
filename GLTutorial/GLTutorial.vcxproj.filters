@@ -203,6 +203,9 @@
     <ClInclude Include="Render.h">
       <Filter>Header Files\AssetLibrary\Deferred Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="Particle.h">
+      <Filter>Header Files\AssetLibrary\Deferred Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\dependencies\glfw3.lib">
