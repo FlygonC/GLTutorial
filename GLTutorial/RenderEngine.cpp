@@ -61,13 +61,13 @@ void RenderEngine::ParticleEmitter::createBuffers()
 		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(2);
 		glEnableVertexAttribArray(3);
-		glEnableVertexAttribArray(4);
+		//glEnableVertexAttribArray(4);
 
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Particle), 0);//vec3
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)(sizeof(float) * 3));//vec3
-		glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)(sizeof(float) * 4));//float
-		glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)(sizeof(float) * 5));//float
-		glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)(sizeof(float) * 6));//float
+		glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)(sizeof(float) * 6));//float
+		glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)(sizeof(float) * 7));//float
+		//glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)(sizeof(float) * 8));//float
 		//unbind
 		glBindVertexArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -333,7 +333,7 @@ void Renderer::render(float deltaTime)
 		}
 	}
 
-	glDisable(GL_DEPTH_TEST);
+	//glDisable(GL_DEPTH_TEST);
 	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glUseProgram(0);
 
@@ -343,33 +343,35 @@ void Renderer::render(float deltaTime)
 		if (emitterData[i].inUse)
 		{
 			//Update
-			//bindShader(AssetManager::instance().get<ASSET::SHADER>("ParticleUpdateShader"));
+			bindShader(AssetManager::instance().get<ASSET::SHADER>("ParticleUpdateShader"));
 
-			//float time = Window::instance().getTime();
-			//setUniform("time", UNIFORM::FLO1, &time);
-			//setUniform("deltaTime", UNIFORM::FLO1, &deltaTime);
-			//setUniform("lifeMin", UNIFORM::FLO1, &emitterData[i].maxLife.start);
-			//setUniform("lifeMax", UNIFORM::FLO1, &emitterData[i].maxLife.end);
-			//setUniform("emitterPosition", UNIFORM::FLO3, &emitterData[i].transform.position);
+			float kyhxc = 0.1f;
 
-			//glEnable(GL_RASTERIZER_DISCARD);
+			float time = Window::instance().getTime();
+			setUniform("time", UNIFORM::FLO1, &time);
+			setUniform("deltaTime", UNIFORM::FLO1, &deltaTime);
+			setUniform("lifeMin", UNIFORM::FLO1, &emitterData[i].maxLife.start);
+			setUniform("lifeMax", UNIFORM::FLO1, &emitterData[i].maxLife.end);
+			setUniform("emitterPosition", UNIFORM::FLO3, &emitterData[i].transform.position);
 
-			//glBindVertexArray(emitterData[i].VAO[emitterData[i].activeBuffer]);
+			glEnable(GL_RASTERIZER_DISCARD);
+			// Read from ActiveBuffer
+			glBindVertexArray(emitterData[i].VAO[emitterData[i].activeBuffer]);
 			unsigned int otherBuffer = (emitterData[i].activeBuffer + 1) % 2;
+			// Write to OtherBuffer
+			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, emitterData[i].VBO[otherBuffer]);
+			glBeginTransformFeedback(GL_POINTS);
 
-			//glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, emitterData[i].VBO[otherBuffer]);
-			//glBeginTransformFeedback(GL_POINTS);
+			glDrawArrays(GL_POINTS, 0, emitterData[i].getMaxParts());
 
-			//glDrawArrays(GL_POINTS, 0, emitterData[i].getMaxParts());
-
-			//glEndTransformFeedback();
-			//glDisable(GL_RASTERIZER_DISCARD);
-			//glBindBufferBase(GL_TRANSFORM_FEEDBACK, 0, 0);
+			glEndTransformFeedback();
+			glDisable(GL_RASTERIZER_DISCARD);
+			glBindBufferBase(GL_TRANSFORM_FEEDBACK, 0, 0);
 			//Draw
 			bindShader(AssetManager::instance().get<ASSET::SHADER>("ParticleDrawShader"));
 
 			setUniform("ProjectionView", UNIFORM::MAT4, glm::value_ptr(camera.getProjectionView()));
-			setUniform("View", UNIFORM::MAT4, glm::value_ptr(camera.getView()));
+			setUniform("WorldTransform", UNIFORM::MAT4, glm::value_ptr(camera.getWorldTransform()));
 
 			setUniform("sizeStart", UNIFORM::FLO1, &emitterData[i].size.start);
 			setUniform("sizeEnd",	UNIFORM::FLO1, &emitterData[i].size.end);
@@ -378,6 +380,7 @@ void Renderer::render(float deltaTime)
 
 			glBindVertexArray(emitterData[i].VAO[otherBuffer]);
 			glDrawArrays(GL_POINTS, 0, emitterData[i].getMaxParts());
+			//glDrawArrays(GL_POINTS, 0, 1);
 
 			emitterData[i].activeBuffer = otherBuffer;
 		}
@@ -394,6 +397,7 @@ void Renderer::render(float deltaTime)
 		// works the same as usual.
 
 	/////////////////////////////////////////////////////////////////////////////
+	glDisable(GL_DEPTH_TEST);
 	//PRE LIGHT CLEAR
 	glBindFramebuffer(GL_FRAMEBUFFER, AssetManager::instance().get<ASSET::FBO>("LightFrameBuffer"));
 	glClear(GL_COLOR_BUFFER_BIT);

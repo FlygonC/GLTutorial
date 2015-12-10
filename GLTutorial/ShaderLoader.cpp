@@ -43,10 +43,11 @@ unsigned int ShaderLoader::createShaderProgramParticle(const std::string vertexS
 	unsigned int program = glCreateProgram();
 	glAttachShader(program, vertexShader);
 	//transform feedback
-	const char* varyings[] = { "position", "velocity", "size", "lifetime", "lifespan" };
-	glTransformFeedbackVaryings(program, 5, varyings, GL_INTERLEAVED_ATTRIBS);
+	const char* varyings[] = { "position", "velocity", "lifetime", "lifespan" };
+	glTransformFeedbackVaryings(program, 4, varyings, GL_INTERLEAVED_ATTRIBS);
 
-	glLinkProgram(program);
+	glLinkProgram(program);
+
 	//make sure it worked
 	glGetProgramiv(program, GL_LINK_STATUS, &success);
 	if (success == GL_FALSE)
