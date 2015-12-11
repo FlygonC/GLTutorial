@@ -63,5 +63,7 @@ void TestApplication::onStep(float dTime)
 
 	object1.data->transform.rotation = glm::vec3(0.f, sin(time), 0.f);
 
+	pLight1.data->position = glm::vec3(cos(time) * 3.f, 0.f, 0.f);
+
 	emitter1.data->transform.position = glm::vec3(sin(time) * 3.f, cos(time) * 3.f, -5.f);
 }

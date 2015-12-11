@@ -38,9 +38,9 @@ void main() {
 	gpassPosition = vPosition.xyz;
 	
 	//Normals
-	mat3 TBN = mat3(normalize( vTangent ).xyz, 
-					normalize( vBiTangent ), 
-					normalize( vNormal ).xyz);
+	mat3 TBN = mat3( normalize( vTangent ).xyz, 
+					 normalize( vBiTangent ), 
+					 normalize( vNormal ).xyz);
 	vec3 N = texture( normalMap, vTexCoord ).xyz * 2 - 1;
 	gpassNormal = (View * vec4(TBN * N,0)).xyz;
 

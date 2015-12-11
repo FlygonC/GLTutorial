@@ -181,7 +181,7 @@ namespace RenderEngine
 	};
 
 
-	const unsigned int objectCount = 5;
+	const unsigned int objectCount = 300;
 	class Renderer
 	{
 		unsigned int boundShader;
