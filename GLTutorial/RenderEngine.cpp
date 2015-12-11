@@ -1,7 +1,7 @@
 #include "RenderEngine.h"
 
 using namespace RenderEngine;
-
+// Geometry
 GeometryObject::GeometryObject()
 {
 	idNum = Renderer::instance().newObject(DATATYPE::GEOMETRY);
@@ -11,37 +11,27 @@ GeometryObject::~GeometryObject()
 {
 	Renderer::instance().clearObject(DATATYPE::GEOMETRY, idNum);
 }
-
-
-
+// Directional Light
 RenderEngine::DirectionalLightObject::DirectionalLightObject()
 {
 	idNum = Renderer::instance().newObject(DATATYPE::DIRECTIONALLIGHT);
 	data = &Renderer::instance().directionalLightData[idNum];
 }
-
 RenderEngine::DirectionalLightObject::~DirectionalLightObject()
 {
 	Renderer::instance().clearObject(DATATYPE::DIRECTIONALLIGHT, idNum);
 }
-
-
-
-
+// Point Light
 RenderEngine::PointLightObject::PointLightObject()
 {
 	idNum = Renderer::instance().newObject(DATATYPE::POINTLIGHT);
 	data = &Renderer::instance().pointLightData[idNum];
 }
-
 RenderEngine::PointLightObject::~PointLightObject()
 {
 	Renderer::instance().clearObject(DATATYPE::POINTLIGHT, idNum);
 }
-
-
-
-
+// Particle Emitter
 void RenderEngine::ParticleEmitter::createBuffers()
 {
 	maxParts = 10000;
@@ -94,12 +84,7 @@ RenderEngine::ParticleEmitterObject::~ParticleEmitterObject()
 	data->clearBuffers();
 }
 
-
-
-
-
-
-
+// Object Managment
 unsigned int Renderer::newObject(DATATYPE::TYPE type)
 {
 	switch (type)
@@ -154,7 +139,6 @@ unsigned int Renderer::newObject(DATATYPE::TYPE type)
 	}
 	return -1;
 }
-
 void Renderer::clearObject(DATATYPE::TYPE type, unsigned int tag)
 {
 	switch (type)
@@ -179,13 +163,6 @@ void Renderer::clearObject(DATATYPE::TYPE type, unsigned int tag)
 		break;
 	}
 }
-
-
-
-
-
-
-
 
 // Rendering ##########################################
 void Renderer::bindShader(unsigned int shader)
@@ -213,9 +190,6 @@ bool Renderer::setUniform(const char * name, UNIFORM::TYPE type, const void * va
 
 	return true;
 }
-
-
-
 //management
 void Renderer::init()
 {
@@ -296,7 +270,7 @@ void RenderEngine::Renderer::setCamera(Camera c)
 //RENDERING #$#$#$#$#$#$#$#$#$#$#$#
 void Renderer::render(float deltaTime)
 {
-	//gpass ########################
+	// Geometry Pass ########################
 	// Init
 	glBindFramebuffer(GL_FRAMEBUFFER, AssetManager::instance().get<ASSET::FBO>("GPassFrameBuffer"));
 	glEnable(GL_DEPTH_TEST);
@@ -332,10 +306,6 @@ void Renderer::render(float deltaTime)
 		}
 	}
 
-	//glDisable(GL_DEPTH_TEST);
-	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	//glUseProgram(0);
-
 	// PARTICLES
 	/////////////////////////////////////////////////////////////////////////////
 	// (UPDATE SHADER)
@@ -355,8 +325,6 @@ void Renderer::render(float deltaTime)
 		{
 			//Update
 			bindShader(AssetManager::instance().get<ASSET::SHADER>("ParticleUpdateShader"));
-
-			float kyhxc = 0.1f;
 
 			float time = Window::instance().getTime();
 			setUniform("time", UNIFORM::FLO1, &time);
@@ -396,7 +364,7 @@ void Renderer::render(float deltaTime)
 			emitterData[i].activeBuffer = otherBuffer;
 		}
 	}
-	
+	// GPass Post
 	glDisable(GL_DEPTH_TEST);
 
 	//PRE LIGHT CLEAR
@@ -404,12 +372,12 @@ void Renderer::render(float deltaTime)
 	glClear(GL_COLOR_BUFFER_BIT);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	//Directional Light ########################
+	//Directional Light & Shadow ########################
 	for (unsigned i = 0; i < objectCount; i++)
 	{
 		if (directionalLightData[i].inUse && directionalLightData[i].visible)
 		{
-			//shadow %%%%%%%%
+			// Shadow %%%%%%%%
 /*prep*/	glm::vec3 m_lightDirection = glm::normalize(directionalLightData[i].direction);
 			float projSize = 200;
 			glm::mat4 lightProjection = glm::ortho<float>(-projSize, projSize, -projSize, projSize, -projSize, projSize);
@@ -447,7 +415,7 @@ void Renderer::render(float deltaTime)
 			glDisable(GL_CULL_FACE);
 
 
-			//light %%%%%%%%
+			// Directional Light %%%%%%%%
 			// DLight prep
 			glBindFramebuffer(GL_FRAMEBUFFER, AssetManager::instance().get<ASSET::FBO>("LightFrameBuffer"));
 			glEnable(GL_BLEND);
@@ -490,7 +458,7 @@ void Renderer::render(float deltaTime)
 	glUseProgram(0);
 
 
-	//plight ########################
+	// Point Light ########################
 	// PLight Prep
 	glBindFramebuffer(GL_FRAMEBUFFER, AssetManager::instance().get<ASSET::FBO>("LightFrameBuffer"));
 	glEnable(GL_BLEND);
@@ -538,7 +506,7 @@ void Renderer::render(float deltaTime)
 	glUseProgram(0);
 
 
-	//comp ########################
+	// Composite Pass ########################
 	// Comp Prep
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -563,10 +531,9 @@ void Renderer::render(float deltaTime)
 	setUniform("specularTexture", UNIFORM::TEX2, &s, 3);
 	setUniform("specularity", UNIFORM::TEX2, &ls, 4);
 
-
 	glBindVertexArray(AssetManager::instance().get<ASSET::VAO>("Quad"));
 	glDrawElements(GL_TRIANGLES, AssetManager::instance().get<ASSET::SIZE>("Quad"), GL_UNSIGNED_INT, 0);
 
-	// Copm Post
+	// Comp Post
 	glUseProgram(0);
 }

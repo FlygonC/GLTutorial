@@ -1,6 +1,7 @@
 #version 410
 
 in vec4 color;
+in vec3 position;
 
 layout(location = 0) out vec3 gpassAlbedo;
 layout(location = 1) out vec3 gpassPosition;
@@ -11,11 +12,11 @@ layout(location = 4) out vec3 gpassGlow;
 void main() {
 	gpassAlbedo = color.xyz;
 	
-	gpassPosition = vec3(0);
+	gpassPosition = position;
 	
 	gpassNormal = vec3(0.5, 0.5, 1);
 	
 	gpassSpecular = vec4(0);
 	
-	gpassGlow = vec3(1);
+	gpassGlow = vec3(0.5);
 }

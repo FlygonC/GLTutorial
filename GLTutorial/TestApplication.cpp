@@ -24,13 +24,14 @@ void TestApplication::onKill()
 
 void TestApplication::onPlay()
 {
-	object1.data->mesh = "Cube";
-	object1.data->material.diffuseTexture = "Test";
-	object1.data->material.normalTexture = "OrbNorm";
-	object1.data->material.specularTexture = "Black";
+	object1.data->mesh = "SoulSpear";
+	object1.data->material.diffuseTexture = "SoulSpearDiffuse";
+	object1.data->material.normalTexture = "SoulSpearNormal";
+	object1.data->material.specularTexture = "SoulSpearSpecular";
+	object1.data->material.specularPower = 8;
 	object1.data->material.glowTexture = "Black";
 	object1.data->transform.scale = glm::vec3(1.f);
-	object1.data->transform.position = glm::vec3(0.f, 0.f, -2.f);
+	object1.data->transform.position = glm::vec3(0.f, 0.f, 0.f);
 
 	object2.data->mesh = "Cube";
 	object2.data->material.diffuseTexture = "Test";
@@ -40,10 +41,10 @@ void TestApplication::onPlay()
 	object2.data->transform.scale = glm::vec3(10.f, 1.f, 10.f);
 	object2.data->transform.position = glm::vec3(0.f, -2.f, 0.f);
 
-	//dLight1.data->
+	dLight1.data->color = glm::vec3(0.5f);
 
-	pLight1.data->position = glm::vec3(-2, -2, -2);
-	pLight1.data->radius = 3.f;
+	pLight1.data->position = glm::vec3(0.f);
+	pLight1.data->radius = 5.f;
 
 	//emitter1.data->velocity = 0.3f;
 	emitter1.data->size.start = 0.1f;
@@ -58,7 +59,9 @@ void TestApplication::onStep(float dTime)
 {
 	camera.update(dTime);
 	RenderEngine::Renderer::instance().setCamera(camera);
-
 	float time = Window::instance().getTime();
-	emitter1.data->transform.position = glm::vec3(sin(time) * 3, cos(time) * 3, 0);
+
+	object1.data->transform.rotation = glm::vec3(0.f, sin(time), 0.f);
+
+	emitter1.data->transform.position = glm::vec3(sin(time) * 3.f, cos(time) * 3.f, -5.f);
 }

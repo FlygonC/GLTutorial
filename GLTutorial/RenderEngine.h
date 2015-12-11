@@ -79,7 +79,6 @@ namespace RenderEngine
 	};
 
 
-
 	class RenderObjectData
 	{
 	protected:
@@ -93,8 +92,6 @@ namespace RenderEngine
 	class Geometry : public RenderObjectData
 	{
 	public:
-		//GeometryData() { type = DATATYPE::GEOMETRY; }
-
 		Asset<ASSET::VAO> mesh;
 		Transform transform;
 		Material material;
@@ -102,16 +99,12 @@ namespace RenderEngine
 	class DirectionalLight : public RenderObjectData
 	{
 	public:
-		//DirectionalLightData() { type = DATATYPE::DIRECTIONALLIGHT; }
-
 		glm::vec3 color = glm::vec3(1);
 		glm::vec3 direction = glm::vec3(1);
 	};
 	class PointLight : public RenderObjectData
 	{
 	public:
-		//PointLightData() { type = DATATYPE::POINTLIGHT; }
-
 		glm::vec3 color = glm::vec3(1);
 		glm::vec3 position = glm::vec3(0);
 		float radius = 1;
@@ -144,7 +137,6 @@ namespace RenderEngine
 		unsigned int VBO[2];
 	};
 	
-
 
 	class BaseObject 
 	{
@@ -192,7 +184,6 @@ namespace RenderEngine
 	const unsigned int objectCount = 5;
 	class Renderer
 	{
-		
 		unsigned int boundShader;
 		unsigned int boundFrameBuffer;
 
