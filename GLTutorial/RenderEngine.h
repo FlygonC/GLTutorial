@@ -118,9 +118,9 @@ namespace RenderEngine
 	};	
 	class ParticleEmitter : public RenderObjectData
 	{
-		unsigned int maxParts = 1000;
+		unsigned int maxParts;
 	public:
-		//ParticleEmitterData() { type = DATATYPE::PARTICLEEMITTER; }
+		ParticleEmitter() : maxParts(10000) {}
 		void createBuffers();
 		void clearBuffers();
 		unsigned int getMaxParts()
@@ -189,43 +189,10 @@ namespace RenderEngine
 	};
 
 
-	const unsigned int objectCount = 300;
+	const unsigned int objectCount = 5;
 	class Renderer
 	{
-		class GPassRender : public RenderPass
-		{
-		public:
-			void prep();
-			void post();
-			//void draw(RenderObjectIn ob, Camera c);
-		};
-		class DLightPassRender : public RenderPass
-		{
-		public:
-			void prep();
-			void post();
-			//void draw(DirectionalLightIn li, Camera c);
-		};
-		class PLightPassRender : public RenderPass
-		{
-		public:
-			void prep();
-			void post();
-			//void draw(PointLightIn li, Camera c);
-		};
-		class CompositePassRender : public RenderPass
-		{
-		public:
-			void prep();
-			void post();
-			//void draw();
-		};
-
-		GPassRender gPass;
-		DLightPassRender dLight;
-		PLightPassRender pLight;
-		CompositePassRender comp;
-
+		
 		unsigned int boundShader;
 		unsigned int boundFrameBuffer;
 
@@ -251,7 +218,6 @@ namespace RenderEngine
 		void kill();
 
 		unsigned int newObject(DATATYPE::TYPE type);
-		void updateObject(unsigned int tag, RenderObjectData* in);
 		void clearObject(DATATYPE::TYPE type, unsigned int tag);
 
 

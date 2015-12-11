@@ -20,11 +20,15 @@ bool AssetLibrary::AssetManager::setInternal(ASSET::GL_Handle_Type t, const char
 	AssetKey key(t, name);
 	if (handles.count(key))
 	{
+#ifdef _DEBUG 
 		std::cout << "Asset " << "<" << TYPE_NAMES[t] << ">" << name << " already exists." << std::endl;
+#endif
 		return false;
 	}
 	handles[key] = handle;
+#ifdef _DEBUG
 	std::cout << "Asset " << "<" << TYPE_NAMES[t] << ">" << name << " created!" << std::endl;
+#endif
 	return true;
 }
 

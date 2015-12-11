@@ -15,6 +15,7 @@ class TestApplication : public AssetLibrary::Application
 	FlyCamera camera;
 
 	GeometryObject object1;
+	GeometryObject object2;
 
 	DirectionalLightObject dLight1;
 

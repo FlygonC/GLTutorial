@@ -44,6 +44,7 @@ RenderEngine::PointLightObject::~PointLightObject()
 
 void RenderEngine::ParticleEmitter::createBuffers()
 {
+	maxParts = 10000;
 	particles = new Particle[maxParts];
 	for (unsigned i = 0; i < 2; i++)
 	{
@@ -152,11 +153,6 @@ unsigned int Renderer::newObject(DATATYPE::TYPE type)
 		break;
 	}
 	return -1;
-}
-
-void Renderer::updateObject(unsigned int tag, RenderObjectData* in)
-{
-	
 }
 
 void Renderer::clearObject(DATATYPE::TYPE type, unsigned int tag)
@@ -301,10 +297,13 @@ void RenderEngine::Renderer::setCamera(Camera c)
 void Renderer::render(float deltaTime)
 {
 	//gpass ########################
-	gPass.prep();
+	// Init
+	glBindFramebuffer(GL_FRAMEBUFFER, AssetManager::instance().get<ASSET::FBO>("GPassFrameBuffer"));
+	glEnable(GL_DEPTH_TEST);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	bindShader(AssetManager::instance().get<ASSET::SHADER>("GPassShader"));
-
+	// Draw
 	setUniform("ProjectionView", UNIFORM::MAT4, glm::value_ptr(camera.getProjectionView()));
 	setUniform("View", UNIFORM::MAT4, glm::value_ptr(camera.getView()));
 
@@ -335,9 +334,21 @@ void Renderer::render(float deltaTime)
 
 	//glDisable(GL_DEPTH_TEST);
 	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glUseProgram(0);
+	//glUseProgram(0);
 
 	// PARTICLES
+	/////////////////////////////////////////////////////////////////////////////
+	// (UPDATE SHADER)
+	// use program
+	// bind uniforms etc.
+	// disable rasterization
+	// bind VAO and VBO for base buffer, use beginTRansformFeedback
+	// do the draw and disable transform feedback
+
+	// (Draw Shader)
+	// works the same as usual.
+
+	/////////////////////////////////////////////////////////////////////////////
 	for (unsigned i = 0; i < objectCount; i++)
 	{
 		if (emitterData[i].inUse)
@@ -385,19 +396,9 @@ void Renderer::render(float deltaTime)
 			emitterData[i].activeBuffer = otherBuffer;
 		}
 	}
-	/////////////////////////////////////////////////////////////////////////////
-	// (UPDATE SHADER)
-		// use program
-		// bind uniforms etc.
-		// disable rasterization
-		// bind VAO and VBO for base buffer, use beginTRansformFeedback
-		// do the draw and disable transform feedback
-
-	// (Draw Shader)
-		// works the same as usual.
-
-	/////////////////////////////////////////////////////////////////////////////
+	
 	glDisable(GL_DEPTH_TEST);
+
 	//PRE LIGHT CLEAR
 	glBindFramebuffer(GL_FRAMEBUFFER, AssetManager::instance().get<ASSET::FBO>("LightFrameBuffer"));
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -447,10 +448,13 @@ void Renderer::render(float deltaTime)
 
 
 			//light %%%%%%%%
-			dLight.prep();
+			// DLight prep
+			glBindFramebuffer(GL_FRAMEBUFFER, AssetManager::instance().get<ASSET::FBO>("LightFrameBuffer"));
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_ONE, GL_ONE);
 
 			bindShader(AssetManager::instance().get<ASSET::SHADER>("DLightShader"));
-
+			// Draw
 			setUniform("cameraView", UNIFORM::MAT4, glm::value_ptr(camera.getView()));
 
 			glm::vec3 d = glm::vec3(camera.getWorldTransform()[3]);
@@ -480,15 +484,24 @@ void Renderer::render(float deltaTime)
 			glDrawElements(GL_TRIANGLES, AssetManager::instance().get<ASSET::SIZE>("Quad"), GL_UNSIGNED_INT, 0);
 		}
 	}
-
-	dLight.post();
+	// DLight Post
+	glDisable(GL_BLEND);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glUseProgram(0);
 
 
 	//plight ########################
-	pLight.prep();
+	// PLight Prep
+	glBindFramebuffer(GL_FRAMEBUFFER, AssetManager::instance().get<ASSET::FBO>("LightFrameBuffer"));
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE, GL_ONE);
+
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
+	glCullFace(GL_FRONT);
 	
 	bindShader(AssetManager::instance().get<ASSET::SHADER>("PLightShader"));
-
+	// Draw
 	for (unsigned i = 0; i < objectCount; i++)
 	{
 		if (pointLightData[i].inUse && pointLightData[i].visible)
@@ -518,15 +531,20 @@ void Renderer::render(float deltaTime)
 			glDrawElements(GL_TRIANGLES, AssetManager::instance().get<ASSET::SIZE>("Cube"), GL_UNSIGNED_INT, 0);
 		}
 	}
-
-	pLight.post();
+	// PLight Post
+	glDisable(GL_BLEND);
+	glDisable(GL_CULL_FACE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glUseProgram(0);
 
 
 	//comp ########################
-	comp.prep();
-	//comp.draw();
-	bindShader(AssetManager::instance().get<ASSET::SHADER>("CompositeShader"));
+	// Comp Prep
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glClear(GL_COLOR_BUFFER_BIT);
 
+	bindShader(AssetManager::instance().get<ASSET::SHADER>("CompositeShader"));
+	// Draw
 	Asset<ASSET::TEXTURE> g;
 	g = "GPassGlow";
 	Asset<ASSET::TEXTURE> a;
@@ -549,191 +567,6 @@ void Renderer::render(float deltaTime)
 	glBindVertexArray(AssetManager::instance().get<ASSET::VAO>("Quad"));
 	glDrawElements(GL_TRIANGLES, AssetManager::instance().get<ASSET::SIZE>("Quad"), GL_UNSIGNED_INT, 0);
 
-	comp.post();
-}
-
-
-
-
-
-void Renderer::GPassRender::prep()
-{
-	glBindFramebuffer(GL_FRAMEBUFFER, AssetManager::instance().get<ASSET::FBO>("GPassFrameBuffer"));
-
-	glEnable(GL_DEPTH_TEST);
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
-void Renderer::GPassRender::post()
-{
-	glDisable(GL_DEPTH_TEST);
-	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	// Copm Post
 	glUseProgram(0);
 }
-
-/*void RenderEngine::Renderer::GPassRender::draw(RenderObjectIn ob, Camera c)
-{
-	glUseProgram(AssetManager::instance().get<ASSET::SHADER>(shader.name.c_str()));
-
-	setUniform("ProjectionView", UNIFORM::MAT4, glm::value_ptr(c.getProjectionView()));
-	setUniform("View", UNIFORM::MAT4, glm::value_ptr(c.getView()));
-
-	setUniform("Model", UNIFORM::MAT4, glm::value_ptr(ob.transform.get()));
-
-	setUniform("specPower", UNIFORM::FLO1, &ob.material.specularPower);
-
-	setUniform("diffuseMap", UNIFORM::TEX2, ob.material.diffuseTexture, 0);
-	setUniform("normalMap", UNIFORM::TEX2, ob.material.normalTexture, 1);
-	setUniform("specularMap", UNIFORM::TEX2, ob.material.specularTexture, 2);
-
-	glBindVertexArray(AssetManager::instance().get<ASSET::VAO>(ob.mesh.name.c_str()));
-	glDrawElements(GL_TRIANGLES, AssetManager::instance().get<ASSET::SIZE>(ob.mesh.name.c_str()), GL_UNSIGNED_INT, 0);
-	
-}*/
-
-
-
-
-
-void RenderEngine::Renderer::DLightPassRender::prep()
-{
-	glBindFramebuffer(GL_FRAMEBUFFER, AssetManager::instance().get<ASSET::FBO>("LightFrameBuffer"));
-
-	//glClear(GL_COLOR_BUFFER_BIT);
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_ONE, GL_ONE);
-}
-
-void RenderEngine::Renderer::DLightPassRender::post()
-{
-	glDisable(GL_BLEND);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glUseProgram(0);
-}
-
-/*void RenderEngine::Renderer::DLightPassRender::draw(DirectionalLightIn li, Camera c)
-{
-	//Do Shadow here
-
-	//glUseProgram(AssetManager::instance().get<ASSET::SHADER>(shader.name.c_str()));
-
-	setUniform("cameraView", UNIFORM::MAT4, glm::value_ptr(c.getView()));
-	setUniform("cameraPosition", UNIFORM::FLO3, glm::value_ptr(c.getWorldTransform()[3]));
-
-	setUniform("lightDirection", UNIFORM::FLO3, glm::value_ptr(li.direction));
-	setUniform("lightDiffuse", UNIFORM::FLO3, glm::value_ptr(li.color));
-	
-	Asset<ASSET::TEXTURE> p;
-	p = "GPassPosition";
-	Asset<ASSET::TEXTURE> n;
-	n = "GPassNormal";
-	Asset<ASSET::TEXTURE> s;
-	s = "GPassSpecular";
-
-	setUniform("positionTexture", UNIFORM::TEX2, &p, 0);
-	setUniform("normalTexture", UNIFORM::TEX2, &n, 1);
-	setUniform("specularMap", UNIFORM::TEX2, &s, 2);
-
-	glBindVertexArray(AssetManager::instance().get<ASSET::VAO>("Quad"));
-	glDrawElements(GL_TRIANGLES, AssetManager::instance().get<ASSET::SIZE>("Quad"), GL_UNSIGNED_INT, 0);
-}*/
-
-
-
-
-
-void RenderEngine::Renderer::PLightPassRender::prep()
-{
-	glBindFramebuffer(GL_FRAMEBUFFER, AssetManager::instance().get<ASSET::FBO>("LightFrameBuffer"));
-
-	//glClear(GL_COLOR_BUFFER_BIT);
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_ONE, GL_ONE);
-
-	glEnable(GL_CULL_FACE);
-	glFrontFace(GL_CCW);
-	glCullFace(GL_FRONT);
-}
-
-void RenderEngine::Renderer::PLightPassRender::post()
-{
-	glDisable(GL_BLEND); 
-	glDisable(GL_CULL_FACE);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glUseProgram(0);
-}
-
-/*void RenderEngine::Renderer::PLightPassRender::draw(PointLightIn li, Camera c)
-{
-	glUseProgram(AssetManager::instance().get<ASSET::SHADER>(shader.name.c_str()));
-
-	setUniform("ProjectionView", UNIFORM::MAT4, glm::value_ptr(c.getProjectionView()));
-	setUniform("cameraView", UNIFORM::MAT4, glm::value_ptr(c.getView()));
-	setUniform("cameraPosition", UNIFORM::FLO3, glm::value_ptr(c.getWorldTransform()[3]));
-
-	setUniform("lightPositionView", UNIFORM::FLO3, glm::value_ptr(c.getView() * glm::vec4(li.position, 1)));
-
-	setUniform("lightPosition", UNIFORM::FLO3, glm::value_ptr(li.position));
-	setUniform("lightDiffuse", UNIFORM::FLO3, glm::value_ptr(li.color));
-	setUniform("lightRadius", UNIFORM::FLO1, &li.radius);
-
-	Asset<ASSET::TEXTURE> p;
-	p = "GPassPosition";
-	Asset<ASSET::TEXTURE> n;
-	n = "GPassNormal";
-	Asset<ASSET::TEXTURE> s;
-	s = "GPassSpecular";
-
-	setUniform("positionTexture", UNIFORM::TEX2, &p, 0);
-	setUniform("normalTexture", UNIFORM::TEX2, &n, 1);
-	setUniform("specularMap", UNIFORM::TEX2, &s, 2);
-
-	glBindVertexArray(AssetManager::instance().get<ASSET::VAO>("Cube"));
-	glDrawElements(GL_TRIANGLES, AssetManager::instance().get<ASSET::SIZE>("Cube"), GL_UNSIGNED_INT, 0);
-}*/
-
-
-
-
-void RenderEngine::Renderer::CompositePassRender::prep()
-{
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	
-}
-
-void RenderEngine::Renderer::CompositePassRender::post()
-{
-	
-	glUseProgram(0);
-}
-
-/*void RenderEngine::Renderer::CompositePassRender::draw()
-{
-	glUseProgram(AssetManager::instance().get<ASSET::SHADER>(shader.name.c_str()));
-
-	Asset<ASSET::TEXTURE> a;
-	a = "GPassAlbedo";
-	Asset<ASSET::TEXTURE> l;
-	l = "LPassLight";
-	Asset<ASSET::TEXTURE> s;
-	s = "GPassSpecular";
-	Asset<ASSET::TEXTURE> ls;
-	ls = "LPassSpecular";
-
-	setUniform("albedoTexture", UNIFORM::TEX2, &a, 0);
-	setUniform("lightTexture", UNIFORM::TEX2, &l, 1);
-	setUniform("specularTexture", UNIFORM::TEX2, &s, 2);
-	setUniform("specularTexture", UNIFORM::TEX2, &ls, 3);
-
-
-	glBindVertexArray(AssetManager::instance().get<ASSET::VAO>("Quad"));
-	glDrawElements(GL_TRIANGLES, AssetManager::instance().get<ASSET::SIZE>("Quad"), GL_UNSIGNED_INT, 0);
-}*/
-
-
